@@ -17,7 +17,7 @@ package
 	 * ...
 	 * @author Duncan Saunders
 	 */
-	[SWF(width="480", height="320", frameRate="60", backgroundColor="#ffffff")]
+	[SWF(width="1024", height="768", frameRate="60", backgroundColor="#ffffff")]
 	public class Main extends Sprite 
 	{
 		
@@ -45,8 +45,8 @@ package
 			var viewPort:Rectangle = new Rectangle(0, 0, screenWidth, screenHeight)
 			 
 			_starling = new Starling(StarlingMain, stage, viewPort);
-			_starling.stage.stageWidth  = 480;
-			_starling.stage.stageHeight = 320;
+			_starling.stage.stageWidth  = 1024;
+			_starling.stage.stageHeight = 768;
 			_starling.start();
 		}
 		
