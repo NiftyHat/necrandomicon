@@ -13,6 +13,11 @@ package game.spells
 		private var _charges:uint = 0
 		private var _scope:Vector.<ISpellScope> = new Vector.<ISpellScope>();
 		
+		private var _color1:int;
+		private var _color2:int;
+		private var _color3:int;
+		private var _icon:String;
+		
 		public function Spell() 
 		{
 			
@@ -23,6 +28,12 @@ package game.spells
 		public function get level():uint {return _level;}
 		public function get charges():uint {return _charges;}
 		public function get scope():Vector.<ISpellScope> { return _scope;}
+		
+		public function get color1():int { return _color1; }
+		public function get color2():int { return _color2; }
+		public function get color3():int { return _color3; }
+		public function get icon():String { return _icon; }
+		
 		
 		
 		

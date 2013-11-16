@@ -13,6 +13,11 @@ package game.spells.interfaces
 		function get charges():uint;
 		function get scope():Vector.<ISpellScope>;
 		
+		function get color1():int;
+		function get color2():int;
+		function get color3():int;
+		
+		function get iconName():String
 		
 	}
 	
