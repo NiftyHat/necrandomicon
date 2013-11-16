@@ -11,7 +11,7 @@ package game.spells
 		private var _speed:uint = 1
 		private var _level:uint = 0
 		private var _charges:uint = 0
-		private var _scope:String = SpellConstants.NOONE;
+		private var _scope:Vector.<ISpellScope> = new Vector.<ISpellScope>();
 		
 		public function Spell() 
 		{
@@ -22,7 +22,7 @@ package game.spells
 		public function get speed():uint {return _speed;}
 		public function get level():uint {return _level;}
 		public function get charges():uint {return _charges;}
-		public function get scope():String { return _scope;}
+		public function get scope():Vector.<ISpellScope> { return _scope;}
 		
 		
 		
