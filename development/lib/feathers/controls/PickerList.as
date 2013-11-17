@@ -18,11 +18,7 @@ package feathers.controls
 	import feathers.system.DeviceCapabilities;
 
 	import starling.core.Starling;
-	import starling.display.DisplayObject;
 	import starling.events.Event;
-	import starling.events.Touch;
-	import starling.events.TouchEvent;
-	import starling.events.TouchPhase;
 
 	/**
 	 * Dispatched when the selected item changes.
@@ -84,11 +80,6 @@ package feathers.controls
 		/**
 		 * @private
 		 */
-		private static const HELPER_TOUCHES_VECTOR:Vector.<Touch> = new <Touch>[];
-
-		/**
-		 * @private
-		 */
 		protected static const INVALIDATION_FLAG_BUTTON_FACTORY:String = "buttonFactory";
 
 		/**
@@ -118,7 +109,6 @@ package feathers.controls
 		public function PickerList()
 		{
 			super();
-			this.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
 		}
 
 		/**
@@ -151,18 +141,23 @@ package feathers.controls
 
 		/**
 		 * The button sub-component.
+		 *
+		 * <p>For internal use in subclasses.</p>
+		 *
+		 * @see #buttonFactory
+		 * @see #createButton()
 		 */
 		protected var button:Button;
 
 		/**
 		 * The list sub-component.
+		 *
+		 * <p>For internal use in subclasses.</p>
+		 *
+		 * @see #listFactory
+		 * @see #createList()
 		 */
 		protected var list:List;
-
-		/**
-		 * @private
-		 */
-		protected var _buttonTouchPointID:int = -1;
 		
 		/**
 		 * @private
@@ -254,8 +249,6 @@ package feathers.controls
 		 * @default -1
 		 *
 		 * @see #selectedItem
-		 *
-		 * @see #selectedItem
 		 */
 		public function get selectedIndex():int
 		{
@@ -303,8 +296,6 @@ package feathers.controls
 		 * list.addEventListener( Event.CHANGE, list_changeHandler );</listing>
 		 *
 		 * @default null
-		 *
-		 * @see #selectedIndex
 		 *
 		 * @see #selectedIndex
 		 */
@@ -570,6 +561,8 @@ package feathers.controls
 		 *     return button;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.Button
 		 * @see #buttonProperties
 		 */
@@ -611,6 +604,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * setInitializerForClass( Button, customButtonInitializer, "my-custom-button");</listing>
+		 *
+		 * @default null
 		 *
 		 * @see #DEFAULT_CHILD_NAME_BUTTON
 		 * @see feathers.core.FeathersControl#nameList
@@ -663,6 +658,8 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * list.buttonProperties.defaultSkin = new Image( upTexture );
 		 * list.buttonProperties.downSkin = new Image( downTexture );</listing>
+		 *
+		 * @default null
 		 *
 		 * @see #buttonFactory
 		 * @see feathers.controls.Button
@@ -737,6 +734,8 @@ package feathers.controls
 		 *     return popUpList;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.List
 		 * @see #listProperties
 		 */
@@ -778,6 +777,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * setInitializerForClass( List, customListInitializer, "my-custom-list");</listing>
+		 *
+		 * @default null
 		 *
 		 * @see #DEFAULT_CHILD_NAME_LIST
 		 * @see feathers.core.FeathersControl#nameList
@@ -830,6 +831,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * list.listProperties.backgroundSkin = new Image( texture );</listing>
+		 *
+		 * @default null
 		 *
 		 * @see #listFactory
 		 * @see feathers.controls.List
@@ -890,13 +893,27 @@ package feathers.controls
 		{
 			if(this._labelFunction != null)
 			{
-				return this._labelFunction(item) as String;
+				var labelResult:Object = this._labelFunction(item);
+				if(labelResult is String)
+				{
+					return labelResult as String;
+				}
+				return labelResult.toString();
 			}
 			else if(this._labelField != null && item && item.hasOwnProperty(this._labelField))
 			{
-				return item[this._labelField] as String;
+				labelResult = item[this._labelField];
+				if(labelResult is String)
+				{
+					return labelResult as String;
+				}
+				return labelResult.toString();
 			}
-			else if(item is Object)
+			else if(item is String)
+			{
+				return item as String;
+			}
+			else if(item)
 			{
 				return item.toString();
 			}
@@ -1021,7 +1038,20 @@ package feathers.controls
 		}
 
 		/**
-		 * @private
+		 * If the component's dimensions have not been set explicitly, it will
+		 * measure its content and determine an ideal size for itself. If the
+		 * <code>explicitWidth</code> or <code>explicitHeight</code> member
+		 * variables are set, those value will be used without additional
+		 * measurement. If one is set, but not the other, the dimension with the
+		 * explicit value will not be measured, but the other non-explicit
+		 * dimension will still need measurement.
+		 *
+		 * <p>Calls <code>setSizeInternal()</code> to set up the
+		 * <code>actualWidth</code> and <code>actualHeight</code> member
+		 * variables used for layout.</p>
+		 *
+		 * <p>Meant for internal use, and subclasses may override this function
+		 * with a custom implementation.</p>
 		 */
 		protected function autoSizeIfNeeded():Boolean
 		{
@@ -1066,7 +1096,15 @@ package feathers.controls
 		}
 
 		/**
-		 * @private
+		 * Creates and adds the <code>button</code> sub-component and
+		 * removes the old instance, if one exists.
+		 *
+		 * <p>Meant for internal use, and subclasses may override this function
+		 * with a custom implementation.</p>
+		 *
+		 * @see #button
+		 * @see #buttonFactory
+		 * @see #customButtonName
 		 */
 		protected function createButton():void
 		{
@@ -1081,12 +1119,19 @@ package feathers.controls
 			this.button = Button(factory());
 			this.button.nameList.add(buttonName);
 			this.button.addEventListener(Event.TRIGGERED, button_triggeredHandler);
-			this.button.addEventListener(TouchEvent.TOUCH, button_touchHandler);
 			this.addChild(this.button);
 		}
 
 		/**
-		 * @private
+		 * Creates and adds the <code>list</code> sub-component and
+		 * removes the old instance, if one exists.
+		 *
+		 * <p>Meant for internal use, and subclasses may override this function
+		 * with a custom implementation.</p>
+		 *
+		 * @see #list
+		 * @see #listFactory
+		 * @see #customListName
 		 */
 		protected function createList():void
 		{
@@ -1159,6 +1204,9 @@ package feathers.controls
 		{
 			this.button.width = this.actualWidth;
 			this.button.height = this.actualHeight;
+
+			//final validation to avoid juggler next frame issues
+			this.button.validate();
 		}
 		
 		/**
@@ -1199,64 +1247,6 @@ package feathers.controls
 		protected function list_changeHandler(event:Event):void
 		{
 			this.selectedIndex = this.list.selectedIndex;
-		}
-
-		/**
-		 * @private
-		 */
-		protected function removedFromStageHandler(event:Event):void
-		{
-			this._buttonTouchPointID = -1;
-		}
-
-		/**
-		 * @private
-		 */
-		protected function button_touchHandler(event:TouchEvent):void
-		{
-			if(!this._isEnabled)
-			{
-				this._buttonTouchPointID = -1;
-				return;
-			}
-			const touches:Vector.<Touch> = event.getTouches(this.button, null, HELPER_TOUCHES_VECTOR);
-			if(touches.length == 0)
-			{
-				return;
-			}
-			if(this._buttonTouchPointID >= 0)
-			{
-				var touch:Touch;
-				for each(var currentTouch:Touch in touches)
-				{
-					if(currentTouch.id == this._buttonTouchPointID)
-					{
-						touch = currentTouch;
-						break;
-					}
-				}
-				if(!touch)
-				{
-					HELPER_TOUCHES_VECTOR.length = 0;
-					return;
-				}
-				if(touch.phase == TouchPhase.ENDED)
-				{
-					this._buttonTouchPointID = -1;
-				}
-			}
-			else
-			{
-				for each(touch in touches)
-				{
-					if(touch.phase == TouchPhase.BEGAN)
-					{
-						this._buttonTouchPointID = touch.id;
-						break;
-					}
-				}
-			}
-			HELPER_TOUCHES_VECTOR.length = 0;
 		}
 
 		/**

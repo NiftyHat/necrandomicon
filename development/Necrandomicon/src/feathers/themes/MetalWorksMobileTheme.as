@@ -1203,14 +1203,14 @@ package feathers.themes
 		protected function headerInitializer(header:Header):void
 		{
 			header.minWidth = 88 * this.scale;
-			header.minHeight = 88 * this.scale;
+			header.minHeight = 60 * this.scale;
 			header.paddingTop = header.paddingRight = header.paddingBottom =
-				header.paddingLeft = 14 * this.scale;
-			header.gap = 8 * this.scale;
-			header.titleGap = 12 * this.scale;
+			header.paddingLeft = 8 * this.scale;
+			header.gap = 4 * this.scale;
+			header.titleGap = 8 * this.scale;
 
 			const backgroundSkin:TiledImage = new TiledImage(this.headerBackgroundSkinTexture, this.scale);
-			backgroundSkin.width = backgroundSkin.height = 88 * this.scale;
+			backgroundSkin.width = backgroundSkin.height = 22 * this.scale;
 			header.backgroundSkin = backgroundSkin;
 			header.titleProperties.textFormat = this.headerTextFormat;
 			header.titleProperties.embedFonts = true;
@@ -1219,7 +1219,7 @@ package feathers.themes
 		protected function headerWithoutBackgroundInitializer(header:Header):void
 		{
 			header.minWidth = 88 * this.scale;
-			header.minHeight = 88 * this.scale;
+			header.minHeight = 22 * this.scale;
 			header.paddingTop = header.paddingBottom = 14 * this.scale;
 			header.paddingLeft = header.paddingRight = 18 * this.scale;
 

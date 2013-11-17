@@ -127,7 +127,7 @@ package feathers.controls
 		 *
 		 * <p>An alternate name should always be added to a component's
 		 * <code>nameList</code> before the component is added to the stage for
-		 * the first time.</p>
+		 * the first time. If it is added later, it will be ignored.</p>
 		 *
 		 * <p>In the following example, the inset style is applied to a grouped
 		 * list:</p>
@@ -301,6 +301,13 @@ package feathers.controls
 		public static const INTERACTION_MODE_MOUSE:String = "mouse";
 
 		/**
+		 * @copy feathers.controls.Scroller#INTERACTION_MODE_TOUCH_AND_SCROLL_BARS
+		 *
+		 * @see feathers.controls.Scroller#interactionMode
+		 */
+		public static const INTERACTION_MODE_TOUCH_AND_SCROLL_BARS:String = "touchAndScrollBars";
+
+		/**
 		 * Constructor.
 		 */
 		public function GroupedList()
@@ -358,7 +365,7 @@ package feathers.controls
 				return;
 			}
 			this._layout = value;
-			this.invalidate(INVALIDATION_FLAG_SCROLL);
+			this.invalidate(INVALIDATION_FLAG_LAYOUT);
 		}
 
 		/**
@@ -367,7 +374,10 @@ package feathers.controls
 		protected var _dataProvider:HierarchicalCollection;
 
 		/**
-		 * The collection of data displayed by the list.
+		 * The collection of data displayed by the list. Changing this property
+		 * to a new value is considered a drastic change to the list's data, so
+		 * the horizontal and vertical scroll positions will be reset, and the
+		 * list's selection will be cleared.
 		 *
 		 * <p>The following example passes in a data provider and tells the item
 		 * renderer how to interpret the data:</p>
@@ -425,6 +435,10 @@ package feathers.controls
 		 * descriptors may be implemented with the
 		 * <code>IHierarchicalCollectionDataDescriptor</code> interface.</p>
 		 *
+		 * <p><em>Warning:</em> A Grouped List's data provider cannot contain
+		 * duplicate items. To display the same item in multiple item renderers,
+		 * you must use separate objects with the same properties.</p>
+		 *
 		 * @default null
 		 *
 		 * @see feathers.data.HierarchicalCollection
@@ -447,17 +461,22 @@ package feathers.controls
 			if(this._dataProvider)
 			{
 				this._dataProvider.removeEventListener(CollectionEventType.RESET, dataProvider_resetHandler);
+				this._dataProvider.removeEventListener(Event.CHANGE, dataProvider_changeHandler);
 			}
 			this._dataProvider = value;
 			if(this._dataProvider)
 			{
 				this._dataProvider.addEventListener(CollectionEventType.RESET, dataProvider_resetHandler);
+				this._dataProvider.addEventListener(Event.CHANGE, dataProvider_changeHandler);
 			}
 
 			//reset the scroll position because this is a drastic change and
 			//the data is probably completely different
 			this.horizontalScrollPosition = 0;
 			this.verticalScrollPosition = 0;
+
+			//clear the selection for the same reason
+			this.setSelectedLocation(-1, -1);
 
 			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
@@ -639,7 +658,7 @@ package feathers.controls
 		 * also have a different type. Use the <code>singleItemRendererType</code>.
 		 * Finally, factories for each of these types may also be customized.</p>
 		 *
-		 * @default DefaultGroupedListItemRenderer
+		 * @default feathers.controls.renderers.DefaultGroupedListItemRenderer
 		 *
 		 * @see feathers.controls.renderers.IGroupedListItemRenderer
 		 * @see #itemRendererFactory
@@ -761,7 +780,7 @@ package feathers.controls
 				return;
 			}
 			this._typicalItem = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**
@@ -783,6 +802,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultGroupedListItemRenderer, customItemRendererInitializer, "my-custom-item-renderer");</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 * @see feathers.core.DisplayListWatcher
@@ -841,6 +862,8 @@ package feathers.controls
 		 * <p>Setting properties in a <code>itemRendererFactory</code> function instead
 		 * of using <code>itemRendererProperties</code> will result in better
 		 * performance.</p>
+		 *
+		 * @default null
 		 *
 		 * @see #itemRendererFactory
 		 * @see feathers.controls.renderers.IGroupedListItemRenderer
@@ -904,6 +927,8 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * list.firstItemRendererType = CustomItemRendererClass;</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.renderer.IGroupedListItemRenderer
 		 * @see #itemRendererType
 		 * @see #lastItemRendererType
@@ -956,6 +981,8 @@ package feathers.controls
 		 *     return renderer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.renderers.IGroupedListItemRenderer
 		 * @see #firstItemRendererType
 		 * @see #itemRendererFactory
@@ -1005,6 +1032,8 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultGroupedListItemRenderer, customFirstItemRendererInitializer, "my-custom-first-item-renderer");</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 * @see feathers.core.DisplayListWatcher
 		 * @see #itemRendererName
@@ -1043,6 +1072,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * list.lastItemRendererType = CustomItemRendererClass;</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.controls.renderer.IGroupedListItemRenderer
 		 * @see #lastItemRendererFactory
@@ -1097,6 +1128,8 @@ package feathers.controls
 		 *     return renderer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.renderers.IGroupedListItemRenderer
 		 * @see #lastItemRendererType
 		 * @see #itemRendererFactory
@@ -1146,6 +1179,8 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultGroupedListItemRenderer, customLastItemRendererInitializer, "my-custom-last-item-renderer");</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 * @see feathers.core.DisplayListWatcher
 		 * @see #itemRendererName
@@ -1184,6 +1219,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * list.singleItemRendererType = CustomItemRendererClass;</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.controls.renderer.IGroupedListItemRenderer
 		 * @see #singleItemRendererFactory
@@ -1238,6 +1275,8 @@ package feathers.controls
 		 *     return renderer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.renderers.IGroupedListItemRenderer
 		 * @see #singleItemRendererType
 		 * @see #itemRendererFactory
@@ -1288,6 +1327,8 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultGroupedListItemRenderer, customSingleItemRendererInitializer, "my-custom-single-item-renderer");</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 * @see feathers.core.DisplayListWatcher
 		 * @see #itemRendererName
@@ -1325,6 +1366,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * list.headerRendererType = CustomHeaderRendererClass;</listing>
+		 *
+		 * @default feathers.controls.renderers.DefaultGroupedListHeaderOrFooterRenderer
 		 *
 		 * @see feathers.controls.renderers.IGroupedListHeaderOrFooterRenderer
 		 * @see #headerRendererFactory
@@ -1375,6 +1418,8 @@ package feathers.controls
 		 *     return renderer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.renderers.IGroupedListHeaderOrFooterRenderer
 		 * @see #headerRendererType
 		 */
@@ -1400,41 +1445,6 @@ package feathers.controls
 		/**
 		 * @private
 		 */
-		protected var _typicalHeader:Object = null;
-
-		/**
-		 * Used to auto-size the grouped list. If the list's width or height is
-		 * <code>NaN</code>, the grouped list will try to automatically pick an
-		 * ideal size. This data is used in that process to create a sample
-		 * header renderer.
-		 *
-		 * <p>The following example provides a typical header:</p>
-		 *
-		 * <listing version="3.0">
-		 * list.typicalHeader = { text: "A typical header" };
-		 * list.headerRendererProperties.contentLabelField = "text";</listing>
-		 */
-		public function get typicalHeader():Object
-		{
-			return this._typicalHeader;
-		}
-
-		/**
-		 * @private
-		 */
-		public function set typicalHeader(value:Object):void
-		{
-			if(this._typicalHeader == value)
-			{
-				return;
-			}
-			this._typicalHeader = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
-		}
-
-		/**
-		 * @private
-		 */
 		protected var _headerRendererName:String = DEFAULT_CHILD_NAME_HEADER_RENDERER;
 
 		/**
@@ -1451,6 +1461,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultGroupedListHeaderOrFooterRenderer, customHeaderRendererInitializer, "my-custom-header-renderer");</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 * @see feathers.core.DisplayListWatcher
@@ -1505,6 +1517,8 @@ package feathers.controls
 		 * <p>Setting properties in a <code>headerRendererFactory</code> function instead
 		 * of using <code>headerRendererProperties</code> will result in better
 		 * performance.</p>
+		 *
+		 * @default null
 		 *
 		 * @see #headerRendererFactory
 		 * @see feathers.controls.renderers.IGroupedListHeaderOrFooterRenderer
@@ -1567,6 +1581,8 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * list.footerRendererType = CustomFooterRendererClass;</listing>
 		 *
+		 * @default feathers.controls.renderers.DefaultGroupedListHeaderOrFooterRenderer
+		 *
 		 * @see feathers.controls.renderers.IGroupedListHeaderOrFooterRenderer
 		 * @see #footerRendererFactory
 		 */
@@ -1616,6 +1632,8 @@ package feathers.controls
 		 *     return renderer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.controls.renderers.IGroupedListHeaderOrFooterRenderer
 		 * @see #footerRendererType
 		 */
@@ -1641,41 +1659,6 @@ package feathers.controls
 		/**
 		 * @private
 		 */
-		protected var _typicalFooter:Object = null;
-
-		/**
-		 * Used to auto-size the grouped list. If the grouped list's width or
-		 * height is <code>NaN</code>, the grouped list will try to
-		 * automatically pick an ideal size. This data is used in that process
-		 * to create a sample footer renderer.
-		 *
-		 * <p>The following example provides a typical footer:</p>
-		 *
-		 * <listing version="3.0">
-		 * list.typicalHeader = { text: "A typical footer" };
-		 * list.footerRendererProperties.contentLabelField = "text";</listing>
-		 */
-		public function get typicalFooter():Object
-		{
-			return this._typicalFooter;
-		}
-
-		/**
-		 * @private
-		 */
-		public function set typicalFooter(value:Object):void
-		{
-			if(this._typicalFooter == value)
-			{
-				return;
-			}
-			this._typicalFooter = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
-		}
-
-		/**
-		 * @private
-		 */
 		protected var _footerRendererName:String = DEFAULT_CHILD_NAME_FOOTER_RENDERER;
 
 		/**
@@ -1692,6 +1675,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultGroupedListHeaderOrFooterRenderer, customFooterRendererInitializer, "my-custom-footer-renderer");</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 * @see feathers.core.DisplayListWatcher
@@ -1746,6 +1731,8 @@ package feathers.controls
 		 * <p>Setting properties in a <code>footerRendererFactory</code> function instead
 		 * of using <code>footerRendererProperties</code> will result in better
 		 * performance.</p>
+		 *
+		 * @default null
 		 *
 		 * @see #footerRendererFactory
 		 * @see feathers.controls.renderers.IGroupedListHeaderOrFooterRenderer
@@ -1814,7 +1801,9 @@ package feathers.controls
 		 * <p>The following example sets the header field:</p>
 		 *
 		 * <listing version="3.0">
-		 * list.headerField = "header";</listing>
+		 * list.headerField = "alphabet";</listing>
+		 *
+		 * @default "header"
 		 *
 		 * @see #headerFunction
 		 */
@@ -1863,6 +1852,8 @@ package feathers.controls
 		 *    return group.header;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see #headerField
 		 */
 		public function get headerFunction():Function
@@ -1903,7 +1894,9 @@ package feathers.controls
 		 * <p>The following example sets the footer field:</p>
 		 *
 		 * <listing version="3.0">
-		 * list.footerField = "footer";</listing>
+		 * list.footerField = "controls";</listing>
+		 *
+		 * @default "footer"
 		 *
 		 * @see #footerFunction
 		 */
@@ -1952,6 +1945,8 @@ package feathers.controls
 		 *    return group.footer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see #footerField
 		 */
 		public function get footerFunction():Function
@@ -1991,6 +1986,10 @@ package feathers.controls
 		 */
 		override public function dispose():void
 		{
+			//clearing selection now so that the data provider setter won't
+			//cause a selection change that triggers events.
+			this._selectedGroupIndex = -1;
+			this._selectedItemIndex = -1;
 			this.dataProvider = null;
 			super.dispose();
 		}
@@ -2170,12 +2169,12 @@ package feathers.controls
 			this.dataViewPort.isSelectable = this._isSelectable;
 			this.dataViewPort.setSelectedLocation(this._selectedGroupIndex, this._selectedItemIndex);
 			this.dataViewPort.dataProvider = this._dataProvider;
+			this.dataViewPort.typicalItem = this._typicalItem;
 
 			this.dataViewPort.itemRendererType = this._itemRendererType;
 			this.dataViewPort.itemRendererFactory = this._itemRendererFactory;
 			this.dataViewPort.itemRendererProperties = this._itemRendererProperties;
 			this.dataViewPort.itemRendererName = this._itemRendererName;
-			this.dataViewPort.typicalItem = this._typicalItem;
 
 			this.dataViewPort.firstItemRendererType = this._firstItemRendererType;
 			this.dataViewPort.firstItemRendererFactory = this._firstItemRendererFactory;
@@ -2193,13 +2192,11 @@ package feathers.controls
 			this.dataViewPort.headerRendererFactory = this._headerRendererFactory;
 			this.dataViewPort.headerRendererProperties = this._headerRendererProperties;
 			this.dataViewPort.headerRendererName = this._headerRendererName;
-			this.dataViewPort.typicalHeader = this._typicalHeader;
 
 			this.dataViewPort.footerRendererType = this._footerRendererType;
 			this.dataViewPort.footerRendererFactory = this._footerRendererFactory;
 			this.dataViewPort.footerRendererProperties = this._footerRendererProperties;
 			this.dataViewPort.footerRendererName = this._footerRendererName;
-			this.dataViewPort.typicalFooter = this._typicalFooter;
 
 			this.dataViewPort.layout = this._layout;
 		}
@@ -2218,16 +2215,25 @@ package feathers.controls
 					this.pendingGroupIndex = -1;
 					this.pendingItemIndex = -1;
 
-					if(this.pendingScrollDuration > 0)
+					var targetHorizontalScrollPosition:Number = HELPER_POINT.x;
+					if(targetHorizontalScrollPosition < this._minHorizontalScrollPosition)
 					{
-						this.throwTo(Math.max(0, Math.min(HELPER_POINT.x, this._maxHorizontalScrollPosition)),
-							Math.max(0, Math.min(HELPER_POINT.y, this._maxVerticalScrollPosition)), this.pendingScrollDuration);
+						targetHorizontalScrollPosition = this._minHorizontalScrollPosition;
 					}
-					else
+					else if(targetHorizontalScrollPosition > this._maxHorizontalScrollPosition)
 					{
-						this.horizontalScrollPosition = Math.max(0, Math.min(HELPER_POINT.x, this._maxHorizontalScrollPosition));
-						this.verticalScrollPosition = Math.max(0, Math.min(HELPER_POINT.y, this._maxVerticalScrollPosition));
+						targetHorizontalScrollPosition = this._maxHorizontalScrollPosition;
 					}
+					var targetVerticalScrollPosition:Number = HELPER_POINT.y;
+					if(targetVerticalScrollPosition < this._minVerticalScrollPosition)
+					{
+						targetVerticalScrollPosition = this._minVerticalScrollPosition;
+					}
+					else if(targetVerticalScrollPosition > this._maxVerticalScrollPosition)
+					{
+						targetVerticalScrollPosition = this._maxVerticalScrollPosition;
+					}
+					this.throwTo(targetHorizontalScrollPosition, targetVerticalScrollPosition, this.pendingScrollDuration);
 				}
 			}
 			super.handlePendingScroll();
@@ -2339,6 +2345,14 @@ package feathers.controls
 					this.setSelectedLocation(groupIndex, itemIndex);
 				}
 			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected function dataProvider_changeHandler(event:Event):void
+		{
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**

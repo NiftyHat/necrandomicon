@@ -7,6 +7,8 @@ accordance with the terms of the accompanying license agreement.
 */
 package feathers.core
 {
+	import feathers.events.FeathersEventType;
+
 	import flash.utils.Dictionary;
 
 	import starling.core.Starling;
@@ -32,6 +34,11 @@ package feathers.core
 		 * @private
 		 */
 		private static const POPUP_TO_FOCUS_MANAGER:Dictionary = new Dictionary(true);
+
+		/**
+		 * @private
+		 */
+		private static const CENTERED_POPUPS:Vector.<DisplayObject> = new <DisplayObject>[];
 		
 		/**
 		 * A function that returns a display object to use as an overlay for
@@ -39,11 +46,24 @@ package feathers.core
 		 *
 		 * <p>This function is expected to have the following signature:</p>
 		 * <pre>function():DisplayObject</pre>
+		 *
+		 * <p>In the following example, the overlay factory is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * PopUpManager.overlayFactory = function():DisplayObject
+		 * {
+		 *     var overlay:Quad = new Quad( 100, 100, 0x000000 );
+		 *     overlay.alpha = 0.75;
+		 *     return overlay;
+		 * };</listing>
 		 */
 		public static var overlayFactory:Function = defaultOverlayFactory;
 
 		/**
-		 * The default factory that creates overlays for modal pop-ups.
+		 * The default factory that creates overlays for modal pop-ups. Creates
+		 * an invisible <code>Quad</code>.
+		 *
+		 * @see starling.display.Quad
 		 */
 		public static function defaultOverlayFactory():DisplayObject
 		{
@@ -65,6 +85,13 @@ package feathers.core
 		/**
 		 * The container where pop-ups are added. If not set manually, defaults
 		 * to the Starling stage.
+		 *
+		 * <p>In the following example, the next tab focus is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * PopUpManager.root = someSprite;</listing>
+		 *
+		 * @default null
 		 */
 		public static function get root():DisplayObjectContainer
 		{
@@ -86,7 +113,7 @@ package feathers.core
 			for(var i:int = 0; i < popUpCount; i++)
 			{
 				var popUp:DisplayObject = popUps[i];
-				var overlay:DisplayObject = DisplayObject(POPUP_TO_OVERLAY[i]);
+				var overlay:DisplayObject = DisplayObject(POPUP_TO_OVERLAY[popUp]);
 				popUp.removeFromParent(false);
 				if(overlay)
 				{
@@ -99,7 +126,7 @@ package feathers.core
 			for(i = 0; i < popUpCount; i++)
 			{
 				popUp = popUps[i];
-				overlay = DisplayObject(POPUP_TO_OVERLAY[i]);
+				overlay = DisplayObject(POPUP_TO_OVERLAY[popUp]);
 				if(overlay)
 				{
 					calculatedRoot.addChild(overlay);
@@ -115,6 +142,25 @@ package feathers.core
 		
 		/**
 		 * Adds a pop-up to the stage.
+		 *
+		 * <p>The pop-up may be modal, meaning that an overlay will be displayed
+		 * between the pop-up and everything under the pop-up manager, and the
+		 * overlay will block touches. The default overlay used for modal
+		 * pop-ups is created by <code>PopUpManager.overlayFactory</code>. A
+		 * custom overlay factory may be passed to <code>PopUpManager.addPopUp()</code>
+		 * to create an overlay that is different from the default one.</p>
+		 *
+		 * <p>A pop-up may be centered globally on the Starling stage. If the
+		 * stage or the pop-up resizes, the pop-up will be repositioned to
+		 * remain in the center. To position a pop-up in the center once,
+		 * specify a value of <code>false</code> when calling
+		 * <code>PopUpManager.addPopUp()</code> and call
+		 * <code>PopUpManager.centerPopUp()</code> manually.</p>
+		 *
+		 * <p>Note: The pop-up manager can only detect if Feathers components
+		 * have been resized in order to reposition them to remain centered.
+		 * Regular Starling display objects do not dispatch a proper resize
+		 * event that the pop-up manager can listen to.</p>
 		 */
 		public static function addPopUp(popUp:DisplayObject, isModal:Boolean = true, isCentered:Boolean = true, customOverlayFactory:Function = null):void
 		{
@@ -152,6 +198,11 @@ package feathers.core
 
 			if(isCentered)
 			{
+				if(popUp is IFeathersControl)
+				{
+					popUp.addEventListener(FeathersEventType.RESIZE, popUp_resizeHandler);
+				}
+				CENTERED_POPUPS.push(popUp);
 				centerPopUp(popUp);
 			}
 		}
@@ -171,6 +222,14 @@ package feathers.core
 
 		/**
 		 * Determines if a display object is a pop-up.
+		 *
+		 * <p>In the following example, we check if a display object is a pop-up:</p>
+		 *
+		 * <listing version="3.0">
+		 * if( PopUpManager.isPopUp( displayObject ) )
+		 * {
+		 *     // do something
+		 * }</listing>
 		 */
 		public static function isPopUp(popUp:DisplayObject):Boolean
 		{
@@ -178,15 +237,43 @@ package feathers.core
 		}
 
 		/**
-		 * Determines if a display object is the top-most pop-up.
+		 * Determines if a pop-up is above the highest overlay (of if there is
+		 * no overlay).
 		 */
 		public static function isTopLevelPopUp(popUp:DisplayObject):Boolean
 		{
-			return popUps.indexOf(popUp) == (popUps.length - 1);
+			var lastIndex:int = popUps.length - 1;
+			for(var i:int = lastIndex; i >= 0; i--)
+			{
+				var otherPopUp:DisplayObject = popUps[i];
+				if(otherPopUp == popUp)
+				{
+					//we haven't encountered an overlay yet, so it is top-level
+					return true;
+				}
+				var overlay:DisplayObject = POPUP_TO_OVERLAY[otherPopUp];
+				if(overlay)
+				{
+					//this is the first overlay, and we haven't found the pop-up
+					//yet, so it is not top-level
+					return false;
+				}
+			}
+			//pop-up was not found at all, so obviously, not top-level
+			return false;
 		}
 		
 		/**
-		 * Centers a pop-up on the stage.
+		 * Centers a pop-up on the stage. Unlike the <code>isCentered</code>
+		 * argument passed to <code>PopUpManager.addPopUp()</code>, the pop-up
+		 * will only be positioned once. If the stage or the pop-up resizes,
+		 * <code>PopUpManager.centerPopUp()</code> will need to be called again
+		 * if it should remain centered.
+		 *
+		 * <p>In the following example, we center a pop-up:</p>
+		 *
+		 * <listing version="3.0">
+		 * PopUpManager.centerPopUp( displayObject );</listing>
 		 */
 		public static function centerPopUp(popUp:DisplayObject):void
 		{
@@ -202,6 +289,20 @@ package feathers.core
 		/**
 		 * @private
 		 */
+		protected static function popUp_resizeHandler(event:Event):void
+		{
+			var popUp:DisplayObject = DisplayObject(event.currentTarget);
+			var index:int = CENTERED_POPUPS.indexOf(popUp);
+			if(index < 0)
+			{
+				return;
+			}
+			centerPopUp(popUp);
+		}
+
+		/**
+		 * @private
+		 */
 		protected static function popUp_removedFromStageHandler(event:Event):void
 		{
 			if(ignoreRemoval)
@@ -210,7 +311,7 @@ package feathers.core
 			}
 			const popUp:DisplayObject = DisplayObject(event.currentTarget);
 			popUp.removeEventListener(Event.REMOVED_FROM_STAGE, popUp_removedFromStageHandler);
-			const index:int = popUps.indexOf(popUp);
+			var index:int = popUps.indexOf(popUp);
 			popUps.splice(index, 1);
 			const overlay:DisplayObject = DisplayObject(POPUP_TO_OVERLAY[popUp]);
 			if(overlay)
@@ -229,6 +330,15 @@ package feathers.core
 				delete POPUP_TO_FOCUS_MANAGER[popUp];
 				FocusManager.removeFocusManager(focusManager);
 			}
+			index = CENTERED_POPUPS.indexOf(popUp);
+			if(index >= 0)
+			{
+				if(popUp is IFeathersControl)
+				{
+					popUp.removeEventListener(FeathersEventType.RESIZE, popUp_resizeHandler);
+				}
+				CENTERED_POPUPS.splice(index, 1);
+			}
 
 			if(popUps.length == 0)
 			{
@@ -242,7 +352,7 @@ package feathers.core
 		protected static function stage_resizeHandler(event:ResizeEvent):void
 		{
 			const stage:Stage = Starling.current.stage;
-			const popUpCount:int = popUps.length;
+			var popUpCount:int = popUps.length;
 			for(var i:int = 0; i < popUpCount; i++)
 			{
 				var popUp:DisplayObject = popUps[i];
@@ -252,6 +362,12 @@ package feathers.core
 					overlay.width = stage.stageWidth;
 					overlay.height = stage.stageHeight;
 				}
+			}
+			popUpCount = CENTERED_POPUPS.length;
+			for(i = 0; i < popUpCount; i++)
+			{
+				popUp = CENTERED_POPUPS[i];
+				centerPopUp(popUp);
 			}
 		}
 	}

@@ -71,14 +71,20 @@ package feathers.controls.renderers
 			if(this._owner)
 			{
 				this._owner.removeEventListener(FeathersEventType.SCROLL_START, owner_scrollStartHandler);
+				this._owner.removeEventListener(FeathersEventType.SCROLL_COMPLETE, owner_scrollCompleteHandler);
 			}
 			this._owner = value;
 			if(this._owner)
 			{
 				const list:List = List(this._owner);
 				this.isSelectableWithoutToggle = list.isSelectable;
-				this.isToggle = list.allowMultipleSelection;
+				if(list.allowMultipleSelection)
+				{
+					//toggling is forced in this case
+					this.isToggle = true;
+				}
 				this._owner.addEventListener(FeathersEventType.SCROLL_START, owner_scrollStartHandler);
+				this._owner.addEventListener(FeathersEventType.SCROLL_COMPLETE, owner_scrollCompleteHandler);
 			}
 			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
@@ -90,18 +96,6 @@ package feathers.controls.renderers
 		{
 			this.owner = null;
 			super.dispose();
-		}
-
-		/**
-		 * @private
-		 */
-		protected function owner_scrollStartHandler(event:Event):void
-		{
-			if(this._touchPointID < 0)
-			{
-				return;
-			}
-			this.handleOwnerScroll();
 		}
 	}
 }

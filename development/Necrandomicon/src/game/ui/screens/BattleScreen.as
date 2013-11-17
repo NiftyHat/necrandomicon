@@ -5,6 +5,7 @@ package game.ui.screens
 	import engine.battle.events.UIEvent;
 	import engine.battle.turns.BattleTurn;
 	import engine.entities.EntityBattleCharacter;
+	import feathers.controls.LayoutGroup;
 	import feathers.controls.Panel;
 	import feathers.controls.PanelScreen;
 	import feathers.controls.Screen;
@@ -23,7 +24,7 @@ package game.ui.screens
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
 	 */
-	public class BattleScreen extends PanelScreen 
+	public class BattleScreen extends LayoutGroup 
 	{
 		private var _battle:BattleEncounter;
 		private var _enemyPanel:Panel;

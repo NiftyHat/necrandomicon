@@ -10,10 +10,14 @@ package feathers.controls.text
 	import feathers.core.FeathersControl;
 	import feathers.core.ITextEditor;
 	import feathers.events.FeathersEventType;
+	import feathers.utils.geom.matrixToRotation;
+	import feathers.utils.geom.matrixToScaleX;
+	import feathers.utils.geom.matrixToScaleY;
 
 	import flash.display.BitmapData;
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
+	import flash.events.SoftKeyboardEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -57,6 +61,22 @@ package feathers.controls.text
 	 * @eventType feathers.events.FeathersEventType.FOCUS_OUT
 	 */
 	[Event(name="focusOut",type="starling.events.Event")]
+
+	/**
+	 * Dispatched when the soft keyboard is activated. Not all text editors will
+	 * activate a soft keyboard.
+	 *
+	 * @eventType feathers.events.FeathersEventType.SOFT_KEYBOARD_ACTIVATE
+	 */
+	[Event(name="softKeyboardActivate",type="starling.events.Event")]
+
+	/**
+	 * Dispatched when the soft keyboard is deactivated. Not all text editors
+	 * will activate a soft keyboard.
+	 *
+	 * @eventType feathers.events.FeathersEventType.SOFT_KEYBOARD_DEACTIVATE
+	 */
+	[Event(name="softKeyboardDeactivate",type="starling.events.Event")]
 
 	/**
 	 * A Feathers text editor that uses the native <code>TextField</code> class
@@ -152,6 +172,13 @@ package feathers.controls.text
 
 		/**
 		 * @inheritDoc
+		 *
+		 * <p>In the following example, the text is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.text = "Lorem ipsum";</listing>
+		 *
+		 * @default ""
 		 */
 		public function get text():String
 		{
@@ -184,6 +211,13 @@ package feathers.controls.text
 
 		/**
 		 * The format of the text, such as font and styles.
+		 *
+		 * <p>In the following example, the text format is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.textFormat = new TextFormat( "Source Sans Pro" );;</listing>
+		 *
+		 * @default null
 		 */
 		public function get textFormat():TextFormat
 		{
@@ -210,6 +244,13 @@ package feathers.controls.text
 
 		/**
 		 * Determines if the TextField should use an embedded font or not.
+		 *
+		 * <p>In the following example, the font is embedded:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.embedFonts = true;</listing>
+		 *
+		 * @default false
 		 */
 		public function get embedFonts():Boolean
 		{
@@ -236,6 +277,13 @@ package feathers.controls.text
 
 		/**
 		 * Determines if the TextField wraps text to the next line.
+		 *
+		 * <p>In the following example, word wrap is enabled:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.wordWrap = true;</listing>
+		 *
+		 * @default false
 		 */
 		public function get wordWrap():Boolean
 		{
@@ -262,6 +310,13 @@ package feathers.controls.text
 
 		/**
 		 * Same as the <code>TextField</code> property with the same name.
+		 *
+		 * <p>In the following example, multiline is enabled:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.multiline = true;</listing>
+		 *
+		 * @default false
 		 */
 		public function get multiline():Boolean
 		{
@@ -288,6 +343,13 @@ package feathers.controls.text
 
 		/**
 		 * Determines if the TextField should display the text as HTML or not.
+		 *
+		 * <p>In the following example, the text is displayed as HTML:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.isHTML = true;</listing>
+		 *
+		 * @default false
 		 */
 		public function get isHTML():Boolean
 		{
@@ -314,6 +376,13 @@ package feathers.controls.text
 
 		/**
 		 * Same as the <code>flash.text.TextField</code> property with the same name.
+		 *
+		 * <p>In the following example, the selection is always shown:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.alwaysShowSelection = true;</listing>
+		 *
+		 * @default false
 		 */
 		public function get alwaysShowSelection():Boolean
 		{
@@ -340,6 +409,13 @@ package feathers.controls.text
 
 		/**
 		 * Same as the <code>flash.text.TextField</code> property with the same name.
+		 *
+		 * <p>In the following example, the text is displayed as as password:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.fontWeight = FontWeight.BOLD;</listing>
+		 *
+		 * @default false
 		 */
 		public function get displayAsPassword():Boolean
 		{
@@ -366,6 +442,13 @@ package feathers.controls.text
 
 		/**
 		 * Same as the <code>flash.text.TextField</code> property with the same name.
+		 *
+		 * <p>In the following example, the maximum character count is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.maxChars = 10;</listing>
+		 *
+		 * @default 0
 		 */
 		public function get maxChars():int
 		{
@@ -392,6 +475,13 @@ package feathers.controls.text
 
 		/**
 		 * Same as the <code>flash.text.TextField</code> property with the same name.
+		 *
+		 * <p>In the following example, the text is restricted to numbers:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.restrict = "0-9";</listing>
+		 *
+		 * @default null
 		 */
 		public function get restrict():String
 		{
@@ -419,6 +509,13 @@ package feathers.controls.text
 		/**
 		 * Determines if the text input is editable. If the text input is not
 		 * editable, it will still appear enabled.
+		 *
+		 * <p>In the following example, the text is not editable:</p>
+		 *
+		 * <listing version="3.0">
+		 * textEditor.isEditable = false;</listing>
+		 *
+		 * @default true
 		 */
 		public function get isEditable():Boolean
 		{
@@ -643,6 +740,8 @@ package feathers.controls.text
 			this.textField.addEventListener(FocusEvent.FOCUS_IN, textField_focusInHandler);
 			this.textField.addEventListener(FocusEvent.FOCUS_OUT, textField_focusOutHandler);
 			this.textField.addEventListener(KeyboardEvent.KEY_DOWN, textField_keyDownHandler);
+			this.textField.addEventListener(SoftKeyboardEvent.SOFT_KEYBOARD_ACTIVATE, textField_softKeyboardActivateHandler);
+			this.textField.addEventListener(SoftKeyboardEvent.SOFT_KEYBOARD_DEACTIVATE, textField_softKeyboardDeactivateHandler);
 
 			this.measureTextField = new TextField();
 			this.measureTextField.autoSize = TextFieldAutoSize.LEFT;
@@ -681,7 +780,20 @@ package feathers.controls.text
 		}
 
 		/**
-		 * @private
+		 * If the component's dimensions have not been set explicitly, it will
+		 * measure its content and determine an ideal size for itself. If the
+		 * <code>explicitWidth</code> or <code>explicitHeight</code> member
+		 * variables are set, those value will be used without additional
+		 * measurement. If one is set, but not the other, the dimension with the
+		 * explicit value will not be measured, but the other non-explicit
+		 * dimension will still need measurement.
+		 *
+		 * <p>Calls <code>setSizeInternal()</code> to set up the
+		 * <code>actualWidth</code> and <code>actualHeight</code> member
+		 * variables used for layout.</p>
+		 *
+		 * <p>Meant for internal use, and subclasses may override this function
+		 * with a custom implementation.</p>
 		 */
 		protected function autoSizeIfNeeded():Boolean
 		{
@@ -793,6 +905,9 @@ package feathers.controls.text
 			{
 				this.refreshSnapshotParameters();
 				this.refreshTextFieldSize();
+				this.getTransformationMatrix(this.stage, HELPER_MATRIX);
+				this.textField.scaleX = matrixToScaleX(HELPER_MATRIX);
+				this.textField.scaleY = matrixToScaleY(HELPER_MATRIX);
 			}
 
 			this.checkIfNewSnapshotIsNeeded();
@@ -824,8 +939,10 @@ package feathers.controls.text
 			this._textFieldOffsetY = 0;
 			this._textFieldClipRect.x = 0;
 			this._textFieldClipRect.y = 0;
-			this._textFieldClipRect.width = this.actualWidth;
-			this._textFieldClipRect.height = this.actualHeight;
+
+			this.getTransformationMatrix(this.stage, HELPER_MATRIX);
+			this._textFieldClipRect.width = this.actualWidth * Starling.contentScaleFactor * matrixToScaleX(HELPER_MATRIX);
+			this._textFieldClipRect.height = this.actualHeight * Starling.contentScaleFactor * matrixToScaleY(HELPER_MATRIX);
 		}
 
 		/**
@@ -844,6 +961,7 @@ package feathers.controls.text
 				this.textField.x = Math.round(starlingViewPort.x + (HELPER_POINT.x * Starling.contentScaleFactor));
 				this.textField.y = Math.round(starlingViewPort.y + (HELPER_POINT.y * Starling.contentScaleFactor));
 			}
+			this.textField.rotation = matrixToRotation(HELPER_MATRIX) * 180 / Math.PI;
 
 			if(this.textSnapshot)
 			{
@@ -902,9 +1020,11 @@ package feathers.controls.text
 				return;
 			}
 			this.getTransformationMatrix(this.stage, HELPER_MATRIX);
+			var globalScaleX:Number = matrixToScaleX(HELPER_MATRIX);
+			var globalScaleY:Number = matrixToScaleY(HELPER_MATRIX);
 			HELPER_MATRIX.identity();
 			HELPER_MATRIX.translate(this._textFieldOffsetX, this._textFieldOffsetY);
-			HELPER_MATRIX.scale(Starling.contentScaleFactor, Starling.contentScaleFactor);
+			HELPER_MATRIX.scale(Starling.contentScaleFactor * globalScaleX, Starling.contentScaleFactor * globalScaleY);
 			var bitmapData:BitmapData = new BitmapData(this._snapshotWidth, this._snapshotHeight, true, 0x00ff00ff);
 			bitmapData.draw(this.textField, HELPER_MATRIX, null, null, this._textFieldClipRect);
 			var newTexture:Texture;
@@ -934,6 +1054,8 @@ package feathers.controls.text
 				}
 			}
 			this.getTransformationMatrix(this.stage, HELPER_MATRIX);
+			this.textSnapshot.scaleX = 1 / matrixToScaleX(HELPER_MATRIX);
+			this.textSnapshot.scaleY = 1 / matrixToScaleY(HELPER_MATRIX);
 			bitmapData.dispose();
 			this._needsNewTexture = false;
 		}
@@ -984,7 +1106,8 @@ package feathers.controls.text
 			this.refreshSnapshot();
 			if(this.textSnapshot)
 			{
-				this.textSnapshot.visible = this._text.length > 0;
+				this.textSnapshot.visible = !this._textFieldHasFocus;
+				this.textSnapshot.alpha = this._text.length > 0 ? 1 : 0;
 			}
 		}
 
@@ -1036,6 +1159,22 @@ package feathers.controls.text
 			{
 				this.dispatchEventWith(FeathersEventType.ENTER);
 			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected function textField_softKeyboardActivateHandler(event:SoftKeyboardEvent):void
+		{
+			this.dispatchEventWith(FeathersEventType.SOFT_KEYBOARD_ACTIVATE, true);
+		}
+
+		/**
+		 * @private
+		 */
+		protected function textField_softKeyboardDeactivateHandler(event:SoftKeyboardEvent):void
+		{
+			this.dispatchEventWith(FeathersEventType.SOFT_KEYBOARD_DEACTIVATE, true);
 		}
 	}
 }

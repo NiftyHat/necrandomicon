@@ -32,13 +32,8 @@ package game.ui.screens.components
 		{
 			
 			super();
-			headerFactory = function():Header
-			{
-				var header:Header = new Header();
-				header.maxHeight = 34 * Starling.contentScaleFactor;
-				return header
-			}
-			minHeight = 100;
+	
+			minHeight = 80;
 			minWidth = 180;
 			
 			//_backgroundDisabledSkin = new Image( disabledTextures );
