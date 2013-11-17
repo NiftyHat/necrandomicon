@@ -1,16 +1,14 @@
 package 
 {
-	import flash.desktop.NativeApplication;
-	import flash.events.Event;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
+	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import flash.ui.Multitouch;
 	import flash.ui.MultitouchInputMode;
-	
-	import flash.display.Sprite;
 	import starling.core.Starling;
+	
 
 	
 	/**
@@ -48,6 +46,8 @@ package
 			_starling.stage.stageWidth  = 1024;
 			_starling.stage.stageHeight = 768;
 			_starling.start();
+			
+			
 		}
 		
 

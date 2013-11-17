@@ -91,14 +91,21 @@ package game.spells
 			
 			id = newId;
 		}
-		public function addScope(vIn:ScopeVO):void {
-			switch(vIn.scopeType) {
+		public function addScope(scopeType:String, scopeEffect:String, weighting:int = 1):void {
+			switch(scopeType) {
 				case ScopeVO.ELEMENT_EFFECT: containsAtLeastOneElement = true; break;
 				case ScopeVO.ELEMENT_TYPE: containsAtLeastOneElementEffect = true; break;
 				case ScopeVO.SPELL_EFFECT: containsAtLeastOneSpellEffect = true; break;
 				case ScopeVO.TARGET: containsAtLeastOneTarget = true; break;
+				default: throw("Not a valid scoping parameter!", 10112);
 			}
-			iconOps.push(vIn);
+			
+			var newScope:ScopeVO = new ScopeVO();
+			newScope.scopeType = scopeType;
+			newScope.scopeOperation = scopeEffect;
+			newScope.scopeWeight = weighting
+			
+			iconOps.push(newScope);
 		}
 		
 		public function buildIcon():IconObject {
@@ -123,7 +130,7 @@ package game.spells
 		
 		public function getIconByID($id:String):IconObject {
 			for (var i:int = 0; i < currentIcons.length; i++) {
-				if(currentIcons[i].iconID == id) return currentIcons[i]
+				if(currentIcons[i].iconID == $id) return currentIcons[i]
 			}
 			throw new Error("ID not found. Nothing to return", 10131);
 			return null;

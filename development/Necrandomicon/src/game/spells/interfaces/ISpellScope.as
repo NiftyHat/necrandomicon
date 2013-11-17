@@ -1,5 +1,6 @@
-package game.spells 
+package game.spells.interfaces 
 {
+	import game.spells.SpellEffectVO;
 	
 	/**
 	 * ...
@@ -14,7 +15,7 @@ package game.spells
 		
 		/**
 		 * Effects: Spell Effects (Type/Element/Element Effect Combinations)
-		 */function get effects():Vector.<SpellEffectVO>;
+		 */function get elements():Vector.<SpellEffectVO>;
 		
 		/**
 		 * Animations: Defined as per SpellAnimationConstants
@@ -27,6 +28,11 @@ package game.spells
 		/**
 		 * Power Rating of this Spell Scope
 		 */function get power():int;
+		 
+		 /**
+		  * Spell Type (Heal, Damage, etc) as defined by SpellEffectConstants
+		  */function get spellType():String
+		
 	}
 	
 }

@@ -1,6 +1,7 @@
 package game.spells.interfaces 
 {
-	import game.spells.ISpellScope;
+	import game.spells.interfaces.ISpellScope;
+	
 	
 	/**
 	 * ...

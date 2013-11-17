@@ -1,6 +1,7 @@
 package game.spells 
 {
 	import game.spells.interfaces.ISpell;
+	import game.spells.interfaces.ISpellScope;
 	/**
 	 * ...
 	 * @author KEvans
@@ -34,6 +35,10 @@ package game.spells
 			
 		}
 		
+		/* INTERFACE game.spells.interfaces.ISpell */
+		
+		public function get iconName():String {return _name;}
+		
 		
 		public function get speed():uint {return _speed;}
 		public function get level():uint {return _level;}
@@ -45,57 +50,13 @@ package game.spells
 		public function get color3():int { return _color3; }
 		public function get icon():String { return _icon; }	//TODO: Replace this with getting the actual icon?
 		
-		
-		public static function generateSpell(iconIn:IconObject, chaosFactor:Number):Spell
-		{
-			var effectTargetTypes:Vector.<ScopeVO> = new Vector.<ScopeVO>()
-			var effectElementTypes:Vector.<ScopeVO>= new Vector.<ScopeVO>()
-			var effectElementEffectTypes:Vector.<ScopeVO>= new Vector.<ScopeVO>()
-			var effectSpellEffectTypes:Vector.<ScopeVO>= new Vector.<ScopeVO>()
-			
-			var i:int, j:int;
-			
-			// Build a dictionary of terms to use based on the icon
-			for (i = 0; i < icon.terms.length; i++) {
-				switch(iconIn.iconOperations[i].scopeType) {
-					
-					case ScopeVO.TARGET:
-						for (j = 0; j < icon.weighting[i]; j++) {
-							effectTargetTypes.push(icon.iconOperations[i]);
-						} break;
-					case ScopeVO.ELEMENT_TYPE:
-						for (j = 0; j < icon.weighting[i]; j++) {
-							effectElementTypes.push(icon.iconOperations[i]);
-						} break;
-					case ScopeVO.ELEMENT_EFFECT:
-						for (j = 0; j < icon.weighting[i]; j++) {
-							effectElementEffectTypes.push(icon.iconOperations[i]);
-						} break;
-					case ScopeVO.SPELL_EFFECT:
-						for (j = 0; j < icon.weighting[i]; j++) {
-							effectSpellEffectTypes.push(icon.iconOperations[i]);
-						} break;
-				}
+		public function toString():String {
+			var rStr = _name.toUpperCase() + " | ";
+			for (var i:int = 0; i < scope.length; i++) {
+				rStr+=(i + ": " + scope[i]+" \r");
 			}
-			
-			var scopeArrays:Vector.<ISpellScope> = new Vector.<ISpellScope>();
-			
-			
-			
-			var color1:int = Math.random() * 0xffffff //TODO: Generate Color based on terms?
-			var color2:int = Math.random() * 0xffffff //As above
-			var color3:int = Math.random() * 0xffffff //As above
-			
-			
-			return new Spell(generateName(), scopeArrays, iconIn.iconImage, color1, color2, color3)
+			return rStr;
 		}
-		
-		static public function generateName():void 
-		{
-			return "Generic Spell Name"; //TODO: Make a fun name generator
-		}
-		
-		
 		
 	}
 
