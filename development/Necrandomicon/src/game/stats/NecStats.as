@@ -24,7 +24,7 @@ package game.stats
 			health.randomize();
 			offense.randomize();
 			defense.randomize();
-			speed.randomize();
+			//speed.randomize();
 		}
 		
 		private function init():void 

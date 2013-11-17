@@ -45,8 +45,8 @@ package engine.entities
 				_stats.randomize();
 			}
 			_actions = new Vector.<BattleAction> ();
-			_actions.push (BattleAction.createAction("Attack", 3));
-			_actions.push (BattleAction.createAction("Defend" , 5));
+			_actions.push (BattleAction.createAction("Attack", 3, BattleAction.SCOPE_ANY));
+			_actions.push (BattleAction.createAction("Defend" , 5, BattleAction.SCOPE_SELF));
 			_actions.push (BattleAction.createAction("Wait", 1));
 			calcTick();
 		}

@@ -41,6 +41,14 @@ package game.ui.screens.components
 			addEventListener(TouchEvent.TOUCH, onTouch);
 		}
 		
+		public function selectedAsTarget():void {
+			Starling.juggler.tween(this, 0.5, { scaleX:0.9, scaleY:0.9 } );
+		}
+		
+		public function unselectedAsTarget():void {
+			Starling.juggler.tween(this, 0.5, { scaleX:1, scaleY:1 } );
+		}
+		
 		private function onTouch(e:TouchEvent):void 
 		{
 			if (e.touches[0].phase == TouchPhase.ENDED) {

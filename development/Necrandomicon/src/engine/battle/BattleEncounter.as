@@ -1,11 +1,15 @@
 package engine.battle 
 {
+	import engine.battle.events.BattleTurnEvent;
 	import engine.battle.events.UIEvent;
+	import engine.battle.turns.BattleTurn;
 	import engine.battle.turns.ConditionalTurn;
 	import engine.battle.turns.ConditionalTurnManager;
 	import engine.entities.EntityBattleCharacter;
 	import flash.events.EventDispatcher;
 	import game.crux.Crux;
+	import game.spells.constants.SpellTargetConstants;
+	import starling.core.Starling;
 	/**
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
@@ -34,7 +38,41 @@ package engine.battle
 			addEnemies([testEnemyA, testEnemyB, testEnemyC]);
 			_turnManager = new ConditionalTurnManager ();
 			Crux.control.dispatchEvent(new UIEvent(UIEvent.BATTLE_SETUP, this));
+			Crux.control.addEventListener(BattleTurnEvent.ACTION_SELECTED, onActionSelected)
+			Crux.control.addEventListener(BattleTurnEvent.COMMIT_ACTION, onCommitAction);
 			startBattle();
+		}
+		
+		private function onCommitAction(e:BattleTurnEvent):void 
+		{
+			var turn:BattleTurn = e.turn;
+			turn.action.execute(turn.targets);
+			Starling.juggler.delayCall(advanceToNextTurn, 0.5);
+		}
+		
+		private function onActionSelected(e:BattleTurnEvent):void 
+		{
+			var turn:BattleTurn = e.turn;
+			var targetScope:String = e.turn.action.targetScope;
+			var selectionScope:String = e.turn.action.selectionScope;
+			var targetList:Vector.<EntityBattleCharacter> = new Vector.<EntityBattleCharacter> ();
+			switch (selectionScope) {
+				default:
+				case BattleAction.SCOPE_ANY:
+					targetList = _characters.slice();
+					break;
+				case BattleAction.SCOPE_ALLY:
+					targetList = _teamAlly.slice();
+					break;
+				case BattleAction.SCOPE_ENEMY:
+					targetList = _teamEnemy.slice();
+					break;
+				case BattleAction.SCOPE_SELF:
+					targetList.push(turn.character);
+					break;
+			}
+			turn.possibleTargets = targetList;
+			Crux.control.dispatchEvent(new BattleTurnEvent(BattleTurnEvent.TARGET_SELECTION, turn));
 		}
 		
 		public function addEnemies($array:Array):void 
@@ -54,6 +92,11 @@ package engine.battle
 		
 		private function startBattle():void {
 			_turnManager.setBattle(this);
+			
+			advanceToNextTurn();
+		}
+		
+		private function advanceToNextTurn():void {
 			_turnManager.updateTurns();
 			var battleTurn:ConditionalTurn = _turnManager.getNextTurn();
 			startTurn(battleTurn);
@@ -65,6 +108,16 @@ package engine.battle
 		}
 		
 		public function getTeam($character:EntityBattleCharacter):Vector.<EntityBattleCharacter> {
+			if (_teamAlly.indexOf($character) != -1) {
+				return _teamAlly;
+			}
+			if (_teamEnemy.indexOf($character) != -1) {
+				return _teamEnemy;
+			}
+			return null;
+		}
+		
+		public function getOpposingTeam($character:EntityBattleCharacter):Vector.<EntityBattleCharacter> {
 			if (_teamAlly.indexOf($character) != -1) {
 				return _teamAlly;
 			}

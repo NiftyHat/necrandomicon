@@ -9,6 +9,7 @@ package engine.battle.events
 	public class UIEvent extends Event 
 	{
 		static public const BATTLE_SETUP:String = "battleSetup";
+		static public const ACTION_SELECT:String = "actionSelect";
 		
 		protected var _data:*;
 		

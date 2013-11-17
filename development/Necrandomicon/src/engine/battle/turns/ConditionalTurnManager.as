@@ -70,7 +70,7 @@ package engine.battle.turns
 				lookAhead += 1;
 			}
 			_turns.sort(sortTurnsOnSpeed);
-			trace(_turns);
+			//trace(_turns);
 		}
 		
 		public function getNextTurn():ConditionalTurn 

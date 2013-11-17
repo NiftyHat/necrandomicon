@@ -1,0 +1,158 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x02bbf301, pid=2344, tid=6900
+#
+# JRE version: 6.0_23-b05
+# Java VM: Java HotSpot(TM) Client VM (19.0-b09 mixed mode, sharing windows-x86 )
+# Problematic frame:
+# J  flex2.compiler.util.QNameList.addAll(Ljava/util/Collection;)Z
+#
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00789400):  JavaThread "main" [_thread_in_Java, id=6900, stack(0x003b0000,0x00400000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x29c960a4
+
+Registers:
+EAX=0x29c960a0, EBX=0x38f17c10, ECX=0x1ce27b98, EDX=0x00000000
+ESP=0x003ff730, EBP=0x003ffb28, ESI=0x00000001, EDI=0x29b57350
+EIP=0x02bbf301, EFLAGS=0x00010206
+
+Register to memory mapping:
+
+EAX=0x29c960a0
+0x29c960a0 is an unallocated location in the heap
+
+EBX=0x38f17c10
+{method} 
+ - klass: {other class}
+
+ECX=0x1ce27b98
+
+[error occurred during error reporting (printing registers, top of stack, instructions near pc), id 0xc0000005]
+
+Stack: [0x003b0000,0x00400000],  sp=0x003ff730,  free space=317k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+J  flex2.compiler.util.QNameList.addAll(Ljava/util/Collection;)Z
+j  flex2.compiler.CompilerAPI.compile(Lflex2/compiler/FileSpec;Lflex2/compiler/SourceList;Ljava/util/Collection;Lflex2/compiler/SourcePath;Lflex2/compiler/ResourceContainer;Lflex2/compiler/ResourceBundlePath;Lflex2/compiler/CompilerSwcContext;Lflex2/compiler/SymbolTable;Lflex2/compiler/util/NameMappings;Lflex2/compiler/common/Configuration;[Lflex2/compiler/SubCompiler;Lflex2/compiler/PreLink;Ljava/util/Map;Ljava/util/List;)Ljava/util/List;+484
+j  flex2.tools.Fcsh.compile_mxmlc(Lflex2/tools/Target;)V+505
+j  flex2.tools.Fcsh.compile(Ljava/lang/String;)V+31
+j  flex2.tools.Fcsh.process(Ljava/lang/String;)V+505
+j  flex2.tools.Fcsh.main([Ljava/lang/String;)V+107
+v  ~StubRoutines::call_stub
+V  [jvm.dll+0xf33c9]
+V  [jvm.dll+0x188a91]
+V  [jvm.dll+0xf344d]
+V  [jvm.dll+0xfce3c]
+V  [jvm.dll+0x104a8d]
+C  [java.exe+0x2155]
+C  [java.exe+0x85b4]
+C  [kernel32.dll+0x1336a]
+C  [ntdll.dll+0x39f72]
+C  [ntdll.dll+0x39f45]
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x05487000 JavaThread "Image Fetcher 0" daemon [_thread_blocked, id=6204, stack(0x05bc0000,0x05c10000)]
+  0x052b0800 JavaThread "AWT-Windows" daemon [_thread_in_native, id=6264, stack(0x05c10000,0x05c60000)]
+  0x052afc00 JavaThread "Java2D Disposer" daemon [_thread_blocked, id=6300, stack(0x059d0000,0x05a20000)]
+  0x00481000 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=5268, stack(0x049a0000,0x049f0000)]
+  0x0047cc00 JavaThread "CompilerThread0" daemon [_thread_blocked, id=3764, stack(0x04910000,0x04960000)]
+  0x00479800 JavaThread "Attach Listener" daemon [_thread_blocked, id=7040, stack(0x04880000,0x048d0000)]
+  0x00476800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=6940, stack(0x047f0000,0x04840000)]
+  0x00470000 JavaThread "Finalizer" daemon [_thread_blocked, id=4956, stack(0x04760000,0x047b0000)]
+  0x0046ec00 JavaThread "Reference Handler" daemon [_thread_blocked, id=3456, stack(0x046d0000,0x04720000)]
+=>0x00789400 JavaThread "main" [_thread_in_Java, id=6900, stack(0x003b0000,0x00400000)]
+
+Other Threads:
+  0x0046c800 VMThread [stack: 0x008f0000,0x00940000] [id=5596]
+  0x0048d000 WatcherThread [stack: 0x04a30000,0x04a80000] [id=6652]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap
+ def new generation   total 40384K, used 12998K [0x1c480000, 0x1f050000, 0x24480000)
+  eden space 35904K,  29% used [0x1c480000, 0x1ceb52e0, 0x1e790000)
+  from space 4480K,  56% used [0x1ebf0000, 0x1ee6c678, 0x1f050000)
+  to   space 4480K,   0% used [0x1e790000, 0x1e790000, 0x1ebf0000)
+ tenured generation   total 89716K, used 29472K [0x24480000, 0x29c1d000, 0x34480000)
+   the space 89716K,  32% used [0x24480000, 0x26148378, 0x26148400, 0x29c1d000)
+ compacting perm gen  total 12288K, used 11828K [0x34480000, 0x35080000, 0x38480000)
+   the space 12288K,  96% used [0x34480000, 0x3500d1d0, 0x3500d200, 0x35080000)
+    ro space 10240K,  51% used [0x38480000, 0x389abd20, 0x389abe00, 0x38e80000)
+    rw space 12288K,  54% used [0x38e80000, 0x39517d58, 0x39517e00, 0x39a80000)
+
+Dynamic libraries:
+0x00400000 - 0x00424000 	C:\Windows\SysWOW64\java.exe
+0x77140000 - 0x772c0000 	C:\Windows\SysWOW64\ntdll.dll
+0x76760000 - 0x76870000 	C:\Windows\syswow64\kernel32.dll
+0x75ef0000 - 0x75f37000 	C:\Windows\syswow64\KERNELBASE.dll
+0x75a10000 - 0x75ab0000 	C:\Windows\syswow64\ADVAPI32.dll
+0x76250000 - 0x762fc000 	C:\Windows\syswow64\msvcrt.dll
+0x76870000 - 0x76889000 	C:\Windows\SysWOW64\sechost.dll
+0x76670000 - 0x76760000 	C:\Windows\syswow64\RPCRT4.dll
+0x74ba0000 - 0x74c00000 	C:\Windows\syswow64\SspiCli.dll
+0x74b90000 - 0x74b9c000 	C:\Windows\syswow64\CRYPTBASE.dll
+0x7c340000 - 0x7c396000 	C:\Program Files (x86)\Java\jre6\bin\msvcr71.dll
+0x6d7f0000 - 0x6da9c000 	C:\Program Files (x86)\Java\jre6\bin\client\jvm.dll
+0x74cc0000 - 0x74dc0000 	C:\Windows\syswow64\USER32.dll
+0x76890000 - 0x76920000 	C:\Windows\syswow64\GDI32.dll
+0x75ad0000 - 0x75ada000 	C:\Windows\syswow64\LPK.dll
+0x76560000 - 0x765fd000 	C:\Windows\syswow64\USP10.dll
+0x72310000 - 0x72342000 	C:\Windows\SysWOW64\WINMM.dll
+0x763d0000 - 0x76430000 	C:\Windows\system32\IMM32.DLL
+0x76b50000 - 0x76c1c000 	C:\Windows\syswow64\MSCTF.dll
+0x72a90000 - 0x72adc000 	C:\Windows\system32\apphelp.dll
+0x6d7a0000 - 0x6d7ac000 	C:\Program Files (x86)\Java\jre6\bin\verify.dll
+0x6d320000 - 0x6d33f000 	C:\Program Files (x86)\Java\jre6\bin\java.dll
+0x6d280000 - 0x6d288000 	C:\Program Files (x86)\Java\jre6\bin\hpi.dll
+0x76380000 - 0x76385000 	C:\Windows\syswow64\PSAPI.DLL
+0x6d7e0000 - 0x6d7ef000 	C:\Program Files (x86)\Java\jre6\bin\zip.dll
+0x6d000000 - 0x6d14a000 	C:\Program Files (x86)\Java\jre6\bin\awt.dll
+0x72c10000 - 0x72c61000 	C:\Windows\SysWOW64\WINSPOOL.DRV
+0x75f40000 - 0x7609c000 	C:\Windows\syswow64\ole32.dll
+0x72ec0000 - 0x7305e000 	C:\Windows\WinSxS\x86_microsoft.windows.common-controls_6595b64144ccf1df_6.0.7601.17514_none_41e6975e2bd6f2b2\COMCTL32.dll
+0x74c00000 - 0x74c57000 	C:\Windows\syswow64\SHLWAPI.dll
+0x71af0000 - 0x71b03000 	C:\Windows\SysWOW64\DWMAPI.DLL
+0x72b90000 - 0x72c10000 	C:\Windows\system32\uxtheme.dll
+0x10000000 - 0x10037000 	C:\Program Files (x86)\ATI Technologies\HydraVision\HydraDMH.dll
+0x05c60000 - 0x05c9e000 	C:\Program Files (x86)\ATI Technologies\HydraVision\HydraGH.dll
+0x76920000 - 0x769af000 	C:\Windows\syswow64\OLEAUT32.dll
+0x73170000 - 0x731c8000 	C:\Program Files (x86)\Common Files\microsoft shared\ink\tiptsf.dll
+0x72af0000 - 0x72af9000 	C:\Windows\SysWOW64\version.dll
+
+VM Arguments:
+jvm_args: -Xmx384m -Dsun.io.useCanonCaches=false -Duser.language=en -Duser.region=US -Dapplication.home=C:\Program Files (x86)\FlashDevelop\Tools\flexsdk 
+java_command: C:\Program Files (x86)\FlashDevelop\Tools\flexsdk\lib\fcsh.jar
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=C:\Program Files (x86)\AMD APP\bin\x86_64;C:\Program Files (x86)\AMD APP\bin\x86;C:\Program Files\Common Files\Microsoft Shared\Windows Live;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\ATI Technologies\ATI.ACE\Core-Static;C:\Program Files\Common Files\Autodesk Shared\;C:\Program Files (x86)\Common Files\Ulead Systems\MPEG;C:\Program Files (x86)\Autodesk\Backburner\;C:\Program Files\Common Files\Microsoft Shared\Windows Live
+USERNAME=Keith
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=AMD64 Family 16 Model 4 Stepping 3, AuthenticAMD
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 7 Build 7601 Service Pack 1
+
+CPU:total 4 (4 cores per cpu, 1 threads per core) family 16 model 4 stepping 3, cmov, cx8, fxsr, mmx, sse, sse2, sse3, popcnt, mmxext, 3dnow, 3dnowext, lzcnt, sse4a
+
+Memory: 4k page, physical 4192440k(1460552k free), swap 8383016k(4998380k free)
+
+vm_info: Java HotSpot(TM) Client VM (19.0-b09) for windows-x86 JRE (1.6.0_23-b05), built on Nov 12 2010 15:00:43 by "java_re" with MS VC++ 7.1 (VS2003)
+
+time: Sun Nov 17 15:06:44 2013
+elapsed time: 18407 seconds
+
