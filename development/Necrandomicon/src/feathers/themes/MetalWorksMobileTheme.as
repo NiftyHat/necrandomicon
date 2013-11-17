@@ -70,6 +70,9 @@ package feathers.themes
 	import feathers.system.DeviceCapabilities;
 	import feathers.textures.Scale3Textures;
 	import feathers.textures.Scale9Textures;
+	import game.ui.screens.components.BattleActionSelect;
+	import game.ui.screens.components.BattleCharacterDetailsPanel;
+	import game.ui.screens.components.BattleCharacterPanel;
 
 	import flash.display.BitmapData;
 	import flash.geom.Rectangle;
@@ -317,7 +320,7 @@ package feathers.themes
 			const regularFontNames:String = "SourceSansPro";
 			const semiboldFontNames:String = "SourceSansProSemibold";
 
-			this.headerTextFormat = new TextFormat(semiboldFontNames, Math.round(36 * this.scale), LIGHT_TEXT_COLOR, true);
+			this.headerTextFormat = new TextFormat(semiboldFontNames, Math.round(24 * this.scale), LIGHT_TEXT_COLOR, true);
 
 			this.smallUIDarkTextFormat = new TextFormat(semiboldFontNames, 24 * this.scale, DARK_TEXT_COLOR, true);
 			this.smallUILightTextFormat = new TextFormat(semiboldFontNames, 24 * this.scale, LIGHT_TEXT_COLOR, true);
@@ -491,6 +494,9 @@ package feathers.themes
 			this.setInitializerForClass(GroupedList, groupedListInitializer);
 			this.setInitializerForClass(GroupedList, insetGroupedListInitializer, GroupedList.ALTERNATE_NAME_INSET_GROUPED_LIST);
 			this.setInitializerForClass(Panel, panelInitializer);
+			this.setInitializerForClass(BattleCharacterPanel, panelInitializer);
+			this.setInitializerForClass(BattleCharacterDetailsPanel, panelInitializer);
+			this.setInitializerForClass(BattleActionSelect, panelInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerToolbarInitializer, ScrollContainer.ALTERNATE_NAME_TOOLBAR);
 		}
@@ -1197,14 +1203,14 @@ package feathers.themes
 		protected function headerInitializer(header:Header):void
 		{
 			header.minWidth = 88 * this.scale;
-			header.minHeight = 88 * this.scale;
+			header.minHeight = 60 * this.scale;
 			header.paddingTop = header.paddingRight = header.paddingBottom =
-				header.paddingLeft = 14 * this.scale;
-			header.gap = 8 * this.scale;
-			header.titleGap = 12 * this.scale;
+			header.paddingLeft = 8 * this.scale;
+			header.gap = 4 * this.scale;
+			header.titleGap = 8 * this.scale;
 
 			const backgroundSkin:TiledImage = new TiledImage(this.headerBackgroundSkinTexture, this.scale);
-			backgroundSkin.width = backgroundSkin.height = 88 * this.scale;
+			backgroundSkin.width = backgroundSkin.height = 22 * this.scale;
 			header.backgroundSkin = backgroundSkin;
 			header.titleProperties.textFormat = this.headerTextFormat;
 			header.titleProperties.embedFonts = true;
@@ -1213,7 +1219,7 @@ package feathers.themes
 		protected function headerWithoutBackgroundInitializer(header:Header):void
 		{
 			header.minWidth = 88 * this.scale;
-			header.minHeight = 88 * this.scale;
+			header.minHeight = 22 * this.scale;
 			header.paddingTop = header.paddingBottom = 14 * this.scale;
 			header.paddingLeft = header.paddingRight = 18 * this.scale;
 

@@ -8,7 +8,8 @@ accordance with the terms of the accompanying license agreement.
 package feathers.core
 {
 	/**
-	 * A list of space-delimited tokens.
+	 * A list of space-delimited tokens. Obviously, since they are delimited by
+	 * spaces, tokens cannot contain spaces.
 	 */
 	public class TokenList
 	{
@@ -26,7 +27,9 @@ package feathers.core
 		protected var names:Vector.<String> = new <String>[];
 
 		/**
-		 * The tokens formated with space delimiters.
+		 * The tokens formatted with space delimiters.
+		 *
+		 * @default ""
 		 */
 		public function get value():String
 		{

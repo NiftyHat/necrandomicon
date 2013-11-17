@@ -30,7 +30,7 @@ package game.stats
 		private function init():void 
 		{
 			health = createStat("Health", 100, 100);
-			offense = createStat("Offence", 5, 10);
+			offense = createStat("Offense", 5, 10);
 			defense = createStat("Defense", 5, 10);
 			speed = createStat("Speed", 50, 100);
 		}

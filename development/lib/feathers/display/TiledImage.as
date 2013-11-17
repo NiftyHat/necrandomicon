@@ -117,6 +117,11 @@ package feathers.display
 		
 		/**
 		 * The texture to tile.
+		 *
+		 * <p>In the following example, the texture is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * image.texture = Texture.fromBitmapData( bitmapData );</listing>
 		 */
 		public function get texture():Texture
 		{
@@ -161,6 +166,13 @@ package feathers.display
 		/**
 		 * The smoothing value to pass to the tiled images.
 		 *
+		 * <p>In the following example, the smoothing is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * image.smoothing = TextureSmoothing.NONE;</listing>
+		 *
+		 * @default starling.textures.TextureSmoothing.BILINEAR
+		 *
 		 * @see starling.textures.TextureSmoothing
 		 */
 		public function get smoothing():String
@@ -191,6 +203,13 @@ package feathers.display
 
 		/**
 		 * The color value to pass to the tiled images.
+		 *
+		 * <p>In the following example, the color is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * image.color = 0xff00ff;</listing>
+		 *
+		 * @default 0xffffff
 		 */
 		public function get color():uint
 		{
@@ -209,6 +228,40 @@ package feathers.display
 			this._color = value;
 			this._propertiesChanged = true;
 		}
+
+		/**
+		 * @private
+		 */
+		private var _useSeparateBatch:Boolean = true;
+
+		/**
+		 * Determines if the tiled images are batched normally by Starling or if
+		 * they're batched separately.
+		 *
+		 * <p>In the following example, separate batching is disabled:</p>
+		 *
+		 * <listing version="3.0">
+		 * image.useSeparateBatch = false;</listing>
+		 *
+		 * @default true
+		 */
+		public function get useSeparateBatch():Boolean
+		{
+			return this._useSeparateBatch;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set useSeparateBatch(value:Boolean):void
+		{
+			if(this._useSeparateBatch == value)
+			{
+				return;
+			}
+			this._useSeparateBatch = value;
+			this._propertiesChanged = true;
+		}
 		
 		/**
 		 * @private
@@ -217,6 +270,13 @@ package feathers.display
 		
 		/**
 		 * The amount to scale the texture. Useful for DPI changes.
+		 *
+		 * <p>In the following example, the texture scale is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * image.textureScale = 2;</listing>
+		 *
+		 * @default 1
 		 */
 		public function get textureScale():Number
 		{
@@ -344,6 +404,7 @@ package feathers.display
 			}
 			if(this._propertiesChanged || this._layoutChanged)
 			{
+				this._batch.batchable = !this._useSeparateBatch;
 				this._batch.reset();
 				this._image.scaleX = this._image.scaleY = this._textureScale;
 				const scaledTextureWidth:Number = this._originalImageWidth * this._textureScale;

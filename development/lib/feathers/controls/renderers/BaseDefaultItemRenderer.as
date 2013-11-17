@@ -113,11 +113,6 @@ package feathers.controls.renderers
 		/**
 		 * @private
 		 */
-		private static const HELPER_TOUCHES_VECTOR:Vector.<Touch> = new <Touch>[];
-
-		/**
-		 * @private
-		 */
 		protected static function defaultLoaderFactory():ImageLoader
 		{
 			return new ImageLoader();
@@ -191,7 +186,7 @@ package feathers.controls.renderers
 		/**
 		 * @private
 		 */
-		protected var _owner:IFeathersControl;
+		protected var _owner:Scroller;
 
 		/**
 		 * @private
@@ -587,7 +582,12 @@ package feathers.controls.renderers
 		/**
 		 * @private
 		 */
-		protected var _accessoryTouchPointID:int = -1;
+		protected var accessoryTouchPointID:int = -1;
+
+		/**
+		 * @private
+		 */
+		protected var _stopScrollingOnAccessoryTouch:Boolean = true;
 
 		/**
 		 * If enabled, calls owner.stopScrolling() when TouchEvents are
@@ -601,7 +601,52 @@ package feathers.controls.renderers
 		 *
 		 * @default true
 		 */
-		public var stopScrollingOnAccessoryTouch:Boolean = true;
+		public function get stopScrollingOnAccessoryTouch():Boolean
+		{
+			return this._stopScrollingOnAccessoryTouch;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set stopScrollingOnAccessoryTouch(value:Boolean):void
+		{
+			this._stopScrollingOnAccessoryTouch = value;
+		}
+
+		/**
+		 * @private
+		 */
+		protected var _delayTextureCreationOnScroll:Boolean = false;
+
+		/**
+		 * If enabled, automatically manages the <code>delayTextureCreation</code>
+		 * property on accessory and icon <code>ImageLoader</code> instances
+		 * when the owner scrolls. This applies to the loaders created when the
+		 * following properties are set: <code>accessorySourceField</code>,
+		 * <code>accessorySourceFunction</code>, <code>iconSourceField</code>,
+		 * and <code>iconSourceFunction</code>.
+		 *
+		 * <p>In the following example, any loaded textures won't be uploaded to
+		 * the GPU until the owner stops scrolling:</p>
+		 *
+		 * <listing version="3.0">
+		 * renderer.delayTextureCreationOnScroll = true;</listing>
+		 *
+		 * @default false
+		 */
+		public function get delayTextureCreationOnScroll():Boolean
+		{
+			return this._delayTextureCreationOnScroll;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set delayTextureCreationOnScroll(value:Boolean):void
+		{
+			this._delayTextureCreationOnScroll = value;
+		}
 
 		/**
 		 * @private
@@ -1367,6 +1412,8 @@ package feathers.controls.renderers
 		 *    return loader;
 		 * };</listing>
 		 *
+		 * @default function():ImageLoader { return new ImageLoader(); }
+		 *
 		 * @see feathers.controls.ImageLoader
 		 * @see #iconSourceField
 		 * @see #iconSourceFunction
@@ -1386,7 +1433,8 @@ package feathers.controls.renderers
 				return;
 			}
 			this._iconLoaderFactory = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
+			this.replaceIcon(null);
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**
@@ -1414,6 +1462,8 @@ package feathers.controls.renderers
 		 *    return loader;
 		 * };</listing>
 		 *
+		 * @default function():ImageLoader { return new ImageLoader(); }
+		 *
 		 * @see feathers.controls.ImageLoader
 		 * @see #accessorySourceField;
 		 * @see #accessorySourceFunction;
@@ -1433,7 +1483,8 @@ package feathers.controls.renderers
 				return;
 			}
 			this._accessoryLoaderFactory = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
+			this.replaceAccessory(null);
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**
@@ -1460,6 +1511,8 @@ package feathers.controls.renderers
 		 *    return renderer;
 		 * };</listing>
 		 *
+		 * @default null
+		 *
 		 * @see feathers.core.ITextRenderer
 		 * @see feathers.core.FeathersControl#defaultTextRendererFactory
 		 * @see #accessoryLabelField
@@ -1480,7 +1533,8 @@ package feathers.controls.renderers
 				return;
 			}
 			this._accessoryLabelFactory = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
+			this.replaceAccessory(null);
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**
@@ -1510,6 +1564,8 @@ package feathers.controls.renderers
 		 * <listing version="3.0">
 		 * renderer.&#64;accessoryLabelProperties.textFormat = new TextFormat( "Source Sans Pro", 16, 0x333333 );
 		 * renderer.&#64;accessoryLabelProperties.embedFonts = true;</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.core.ITextRenderer
 		 * @see #accessoryLabelFactory
@@ -1597,13 +1653,27 @@ package feathers.controls.renderers
 		{
 			if(this._labelFunction != null)
 			{
-				return this._labelFunction(item).toString();
+				var labelResult:Object = this._labelFunction(item);
+				if(labelResult is String)
+				{
+					return labelResult as String;
+				}
+				return labelResult.toString();
 			}
 			else if(this._labelField != null && item && item.hasOwnProperty(this._labelField))
 			{
-				return item[this._labelField].toString();
+				labelResult = item[this._labelField];
+				if(labelResult is String)
+				{
+					return labelResult as String;
+				}
+				return labelResult.toString();
 			}
-			else if(item is Object)
+			else if(item is String)
+			{
+				return item as String;
+			}
+			else if(item)
 			{
 				return item.toString();
 			}
@@ -1678,14 +1748,28 @@ package feathers.controls.renderers
 			}
 			else if(this._accessoryLabelFunction != null)
 			{
-				var label:String = this._accessoryLabelFunction(item).toString();
-				this.refreshAccessoryLabel(label);
+				var labelResult:Object = this._accessoryLabelFunction(item);
+				if(labelResult is String)
+				{
+					this.refreshAccessoryLabel(labelResult as String);
+				}
+				else
+				{
+					this.refreshAccessoryLabel(labelResult.toString());
+				}
 				return DisplayObject(this.accessoryLabel);
 			}
 			else if(this._accessoryLabelField != null && item && item.hasOwnProperty(this._accessoryLabelField))
 			{
-				label = item[this._accessoryLabelField].toString();
-				this.refreshAccessoryLabel(label);
+				labelResult = item[this._accessoryLabelField];
+				if(labelResult is String)
+				{
+					this.refreshAccessoryLabel(labelResult as String);
+				}
+				else
+				{
+					this.refreshAccessoryLabel(labelResult.toString());
+				}
 				return DisplayObject(this.accessoryLabel);
 			}
 			else if(this._accessoryFunction != null)
@@ -1705,21 +1789,22 @@ package feathers.controls.renderers
 		 */
 		override protected function draw():void
 		{
+			const stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
 			const dataInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_DATA);
 			const stylesInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STYLES);
 			if(dataInvalid)
 			{
 				this.commitData();
 			}
-			if(dataInvalid || stylesInvalid)
+			if(stateInvalid || dataInvalid || stylesInvalid)
 			{
-				this.refreshAccessoryLabelStyles();
+				this.refreshAccessory();
 			}
 			super.draw();
 		}
 
 		/**
-		 * @private
+		 * @inheritDoc
 		 */
 		override protected function autoSizeIfNeeded():Boolean
 		{
@@ -1821,14 +1906,19 @@ package feathers.controls.renderers
 				return width;
 			}
 
-			if(isNaN(width))
+			var hasPreviousItem:Boolean = !isNaN(width);
+			if(!hasPreviousItem)
 			{
 				width = 0;
 			}
 
 			if(this._iconPosition == ICON_POSITION_LEFT || this._iconPosition == ICON_POSITION_LEFT_BASELINE || this._iconPosition == ICON_POSITION_RIGHT || this._iconPosition == ICON_POSITION_RIGHT_BASELINE)
 			{
-				width += this.currentIcon.width + gap;
+				if(hasPreviousItem)
+				{
+					width += gap;
+				}
+				width += this.currentIcon.width;
 			}
 			else
 			{
@@ -1847,19 +1937,24 @@ package feathers.controls.renderers
 				return width;
 			}
 
-			if(isNaN(width))
+			var hasPreviousItem:Boolean = !isNaN(width);
+			if(!hasPreviousItem)
 			{
 				width = 0;
 			}
 
 			if(this._accessoryPosition == ACCESSORY_POSITION_LEFT || this._accessoryPosition == ACCESSORY_POSITION_RIGHT)
 			{
-				var adjustedAccessoryGap:Number = isNaN(this._accessoryGap) ? gap : this._accessoryGap;
-				if(adjustedAccessoryGap == Number.POSITIVE_INFINITY)
+				if(hasPreviousItem)
 				{
-					adjustedAccessoryGap = Math.min(this._paddingLeft, this._paddingRight, this._gap);
+					var adjustedAccessoryGap:Number = isNaN(this._accessoryGap) ? gap : this._accessoryGap;
+					if(adjustedAccessoryGap == Number.POSITIVE_INFINITY)
+					{
+						adjustedAccessoryGap = Math.min(this._paddingLeft, this._paddingRight, this._gap);
+					}
+					width += adjustedAccessoryGap;
 				}
-				width += this.accessory.width + adjustedAccessoryGap;
+				width += this.accessory.width;
 			}
 			else
 			{
@@ -1879,14 +1974,19 @@ package feathers.controls.renderers
 				return height;
 			}
 
-			if(isNaN(height))
+			var hasPreviousItem:Boolean = !isNaN(height);
+			if(!hasPreviousItem)
 			{
 				height = 0;
 			}
 
 			if(this._iconPosition == ICON_POSITION_TOP || this._iconPosition == ICON_POSITION_BOTTOM)
 			{
-				height += this.currentIcon.height + gap;
+				if(hasPreviousItem)
+				{
+					height += gap;
+				}
+				height += this.currentIcon.height;
 			}
 			else
 			{
@@ -1905,19 +2005,24 @@ package feathers.controls.renderers
 				return height;
 			}
 
-			if(isNaN(height))
+			var hasPreviousItem:Boolean = !isNaN(height);
+			if(!hasPreviousItem)
 			{
 				height = 0;
 			}
 
 			if(this._accessoryPosition == ACCESSORY_POSITION_TOP || this._accessoryPosition == ACCESSORY_POSITION_BOTTOM)
 			{
-				var adjustedAccessoryGap:Number = isNaN(this._accessoryGap) ? gap : this._accessoryGap;
-				if(adjustedAccessoryGap == Number.POSITIVE_INFINITY)
+				if(hasPreviousItem)
 				{
-					adjustedAccessoryGap = Math.min(this._paddingTop, this._paddingBottom, this._gap);
+					var adjustedAccessoryGap:Number = isNaN(this._accessoryGap) ? gap : this._accessoryGap;
+					if(adjustedAccessoryGap == Number.POSITIVE_INFINITY)
+					{
+						adjustedAccessoryGap = Math.min(this._paddingTop, this._paddingBottom, this._gap);
+					}
+					height += adjustedAccessoryGap;
 				}
-				height += this.accessory.height + adjustedAccessoryGap;
+				height += this.accessory.height;
 			}
 			else
 			{
@@ -1936,6 +2041,9 @@ package feathers.controls.renderers
 				if(this._itemHasLabel)
 				{
 					this._label = this.itemToLabel(this._data);
+					//we don't need to invalidate because the label setter
+					//uses the same data invalidation flag that triggered this
+					//call to commitData(), so we're already properly invalid.
 				}
 				if(this._itemHasIcon)
 				{
@@ -1946,6 +2054,10 @@ package feathers.controls.renderers
 				{
 					const newAccessory:DisplayObject = this.itemToAccessory(this._data);
 					this.replaceAccessory(newAccessory);
+				}
+				else
+				{
+					this.replaceAccessory(null);
 				}
 			}
 			else
@@ -1986,10 +2098,26 @@ package feathers.controls.renderers
 				this.currentIcon.removeFromParent(false);
 				this.currentIcon = null;
 			}
-			//we're using currentIcon above, but defaultIcon here. if you're
-			//wondering, that's intentional. the currentIcon will set to the
-			//defaultIcon elsewhere.
-			this.defaultIcon = newIcon;
+			//we're using currentIcon above, but we're emulating calling the
+			//defaultIcon setter here. the Button class sets the currentIcon
+			//elsewhere, so we want to take advantage of that exisiting code.
+
+			//we're not calling the defaultIcon setter directly because we're in
+			//the middle of validating, and it will just invalidate, which will
+			//require another validation later. we want the Button class to
+			//process the new icon immediately when we call super.draw().
+			if(this._iconSelector.defaultValue != newIcon)
+			{
+				this._iconSelector.defaultValue = newIcon;
+				//we don't need to do a full invalidation. the superclass will
+				//correctly see this flag when we call super.draw().
+				this.setInvalidationFlag(INVALIDATION_FLAG_STYLES);
+			}
+
+			if(this.iconImage)
+			{
+				this.iconImage.delayTextureCreation = this._delayTextureCreationOnScroll && this._owner.isScrolling;
+			}
 		}
 
 		/**
@@ -2048,24 +2176,32 @@ package feathers.controls.renderers
 				}
 				this.addChild(this.accessory);
 			}
+			
+			if(this.accessoryImage)
+			{
+				this.accessoryImage.delayTextureCreation = this._delayTextureCreationOnScroll && this._owner.isScrolling;
+			}
 		}
 
 		/**
 		 * @private
 		 */
-		protected function refreshAccessoryLabelStyles():void
+		protected function refreshAccessory():void
 		{
-			if(!this.accessoryLabel)
+			if(this.accessory is IFeathersControl)
 			{
-				return;
+				IFeathersControl(this.accessory).isEnabled = this._isEnabled;
 			}
-			const displayAccessoryLabel:DisplayObject = DisplayObject(this.accessoryLabel);
-			for(var propertyName:String in this._accessoryLabelProperties)
+			if(this.accessoryLabel)
 			{
-				if(displayAccessoryLabel.hasOwnProperty(propertyName))
+				const displayAccessoryLabel:DisplayObject = DisplayObject(this.accessoryLabel);
+				for(var propertyName:String in this._accessoryLabelProperties)
 				{
-					var propertyValue:Object = this._accessoryLabelProperties[propertyName];
-					displayAccessoryLabel[propertyName] = propertyValue;
+					if(displayAccessoryLabel.hasOwnProperty(propertyName))
+					{
+						var propertyValue:Object = this._accessoryLabelProperties[propertyName];
+						displayAccessoryLabel[propertyName] = propertyValue;
+					}
 				}
 			}
 		}
@@ -2453,22 +2589,52 @@ package feathers.controls.renderers
 		/**
 		 * @private
 		 */
-		protected function handleOwnerScroll():void
+		protected function owner_scrollStartHandler(event:Event):void
 		{
-			this._touchPointID = -1;
+			if(this._delayTextureCreationOnScroll)
+			{
+				if(this.accessoryImage)
+				{
+					this.accessoryImage.delayTextureCreation = true;
+				}
+				if(this.iconImage)
+				{
+					this.iconImage.delayTextureCreation = true;
+				}
+			}
+
+			if(this.touchPointID < 0 && this.accessoryTouchPointID < 0)
+			{
+				return;
+			}
+			this.resetTouchState();
 			if(this._stateDelayTimer && this._stateDelayTimer.running)
 			{
 				this._stateDelayTimer.stop();
 			}
 			this._delayedCurrentState = null;
-			if(this._currentState != Button.STATE_UP)
-			{
-				super.currentState = Button.STATE_UP;
-			}
 
-			if(this._accessoryTouchPointID >= 0)
+			if(this.accessoryTouchPointID >= 0)
 			{
-				Scroller(this._owner).stopScrolling();
+				this._owner.stopScrolling();
+			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected function owner_scrollCompleteHandler(event:Event):void
+		{
+			if(this._delayTextureCreationOnScroll)
+			{
+				if(this.accessoryImage)
+				{
+					this.accessoryImage.delayTextureCreation = false;
+				}
+				if(this.iconImage)
+				{
+					this.iconImage.delayTextureCreation = false;
+				}
 			}
 		}
 
@@ -2478,7 +2644,7 @@ package feathers.controls.renderers
 		override protected function button_removedFromStageHandler(event:Event):void
 		{
 			super.button_removedFromStageHandler(event);
-			this._accessoryTouchPointID = -1;
+			this.accessoryTouchPointID = -1;
 		}
 
 		/**
@@ -2513,10 +2679,32 @@ package feathers.controls.renderers
 		/**
 		 * @private
 		 */
+		override protected function button_touchHandler(event:TouchEvent):void
+		{
+			if(this.accessory && this.touchPointID < 0)
+			{
+				//ignore all touches on accessory. return to up state.
+				var touch:Touch = event.getTouch(this.accessory);
+				if(touch)
+				{
+					this.currentState = Button.STATE_UP;
+					return;
+				}
+			}
+			super.button_touchHandler(event);
+		}
+
+		/**
+		 * @private
+		 */
 		protected function accessory_touchHandler(event:TouchEvent):void
 		{
-			if(!this._isEnabled ||
-				!this.stopScrollingOnAccessoryTouch ||
+			if(!this._isEnabled)
+			{
+				this.accessoryTouchPointID = -1;
+				return;
+			}
+			if(!this.stopScrollingOnAccessoryTouch ||
 				this.accessory == this.accessoryLabel ||
 				this.accessory == this.accessoryImage)
 			{
@@ -2524,46 +2712,24 @@ package feathers.controls.renderers
 				return;
 			}
 
-			const touches:Vector.<Touch> = event.getTouches(this.accessory, null, HELPER_TOUCHES_VECTOR);
-			if(touches.length == 0)
+			if(this.accessoryTouchPointID >= 0)
 			{
-				return;
-			}
-			if(this._accessoryTouchPointID >= 0)
-			{
-				var touch:Touch;
-				for each(var currentTouch:Touch in touches)
-				{
-					if(currentTouch.id == this._accessoryTouchPointID)
-					{
-						touch = currentTouch;
-						break;
-					}
-				}
-
+				var touch:Touch = event.getTouch(this.accessory, TouchPhase.ENDED, this.accessoryTouchPointID);
 				if(!touch)
 				{
-					HELPER_TOUCHES_VECTOR.length = 0;
 					return;
 				}
-
-				if(touch.phase == TouchPhase.ENDED)
-				{
-					this._accessoryTouchPointID = -1;
-				}
+				this.accessoryTouchPointID = -1;
 			}
 			else //if we get here, we don't have a saved touch ID yet
 			{
-				for each(touch in touches)
+				touch = event.getTouch(this.accessory, TouchPhase.BEGAN);
+				if(!touch)
 				{
-					if(touch.phase == TouchPhase.BEGAN)
-					{
-						this._accessoryTouchPointID = touch.id;
-						break;
-					}
+					return;
 				}
+				this.accessoryTouchPointID = touch.id;
 			}
-			HELPER_TOUCHES_VECTOR.length = 0;
 		}
 
 		/**

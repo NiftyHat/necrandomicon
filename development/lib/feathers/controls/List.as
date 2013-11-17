@@ -155,6 +155,13 @@ package feathers.controls
 		 * @see feathers.controls.Scroller#interactionMode
 		 */
 		public static const INTERACTION_MODE_MOUSE:String = "mouse";
+
+		/**
+		 * @copy feathers.controls.Scroller#INTERACTION_MODE_TOUCH_AND_SCROLL_BARS
+		 *
+		 * @see feathers.controls.Scroller#interactionMode
+		 */
+		public static const INTERACTION_MODE_TOUCH_AND_SCROLL_BARS:String = "touchAndScrollBars";
 		
 		/**
 		 * Constructor.
@@ -199,6 +206,8 @@ package feathers.controls
 		 * layout.gap = 20;
 		 * layout.padding = 20;
 		 * list.layout = layout;</listing>
+		 *
+		 * @default null
 		 */
 		public function get layout():ILayout
 		{
@@ -215,7 +224,7 @@ package feathers.controls
 				return;
 			}
 			this._layout = value;
-			this.invalidate(INVALIDATION_FLAG_SCROLL);
+			this.invalidate(INVALIDATION_FLAG_LAYOUT);
 		}
 		
 		/**
@@ -224,7 +233,10 @@ package feathers.controls
 		protected var _dataProvider:ListCollection;
 		
 		/**
-		 * The collection of data displayed by the list.
+		 * The collection of data displayed by the list. Changing this property
+		 * to a new value is considered a drastic change to the list's data, so
+		 * the horizontal and vertical scroll positions will be reset, and the
+		 * list's selection will be cleared.
 		 *
 		 * <p>The following example passes in a data provider and tells the item
 		 * renderer how to interpret the data:</p>
@@ -246,6 +258,10 @@ package feathers.controls
 		 *     return renderer;
 		 * };</listing>
 		 *
+		 * <p><em>Warning:</em> A List's data provider cannot contain duplicate
+		 * items. To display the same item in multiple item renderers, you must
+		 * use separate objects with the same properties.</p>
+		 *
 		 * @default null
 		 */
 		public function get dataProvider():ListCollection
@@ -265,17 +281,22 @@ package feathers.controls
 			if(this._dataProvider)
 			{
 				this._dataProvider.removeEventListener(CollectionEventType.RESET, dataProvider_resetHandler);
+				this._dataProvider.removeEventListener(Event.CHANGE, dataProvider_changeHandler);
 			}
 			this._dataProvider = value;
 			if(this._dataProvider)
 			{
 				this._dataProvider.addEventListener(CollectionEventType.RESET, dataProvider_resetHandler);
+				this._dataProvider.addEventListener(Event.CHANGE, dataProvider_changeHandler);
 			}
 
 			//reset the scroll position because this is a drastic change and
 			//the data is probably completely different
 			this.horizontalScrollPosition = 0;
 			this.verticalScrollPosition = 0;
+
+			//clear the selection for the same reason
+			this.selectedIndex = -1;
 
 			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
@@ -637,7 +658,7 @@ package feathers.controls
 		 * <listing version="3.0">
 		 * list.itemRendererType = CustomItemRendererClass;</listing>
 		 *
-		 * @default DefaultListItemRenderer
+		 * @default feathers.controls.renderers.DefaultListItemRenderer
 		 *
 		 * @see feathers.controls.renderers.IListItemRenderer
 		 * @see #itemRendererFactory
@@ -747,7 +768,7 @@ package feathers.controls
 				return;
 			}
 			this._typicalItem = value;
-			this.invalidate(INVALIDATION_FLAG_STYLES);
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**
@@ -769,6 +790,8 @@ package feathers.controls
 		 *
 		 * <listing version="3.0">
 		 * setInitializerForClass( DefaultListItemRenderer, customItemRendererInitializer, "my-custom-item-renderer");</listing>
+		 *
+		 * @default null
 		 *
 		 * @see feathers.core.FeathersControl#nameList
 		 */
@@ -823,6 +846,8 @@ package feathers.controls
 		 * <p>Setting properties in a <code>itemRendererFactory</code> function
 		 * instead of using <code>itemRendererProperties</code> will result in
 		 * better performance.</p>
+		 *
+		 * @default null
 		 *
 		 * @see #itemRendererFactory
 		 * @see feathers.controls.renderers.IListItemRenderer
@@ -901,6 +926,15 @@ package feathers.controls
 		 * <code>animationDuration</code> is greater than zero, the scroll will
 		 * animate. The duration is in seconds.
 		 *
+		 * <p>If the layout is virtual with variable item dimensions, this
+		 * function may not accurately scroll to the exact correct position. A
+		 * virtual layout with variable item dimensions is often forced to
+		 * estimate positions, so the results aren't guaranteed to be accurate.</p>
+		 *
+		 * <p>If you want to scroll to the end of the list, it is better to use
+		 * <code>scrollToPosition()</code> with <code>maxHorizontalScrollPosition</code>
+		 * or <code>maxVerticalScrollPosition</code>.</p>
+		 *
 		 * <p>In the following example, the list is scrolled to display index 10:</p>
 		 *
 		 * <listing version="3.0">
@@ -908,6 +942,8 @@ package feathers.controls
 		 * 
 		 * @param index The integer index of an item from the data provider.
 		 * @param animationDuration The length of time, in seconds, of the animation. May be zero to scroll instantly.
+		 *
+		 * @see #scrollToPosition()
 		 */
 		public function scrollToDisplayIndex(index:int, animationDuration:Number = 0):void
 		{
@@ -930,6 +966,10 @@ package feathers.controls
 		 */
 		override public function dispose():void
 		{
+			//clearing selection now so that the data provider setter won't
+			//cause a selection change that triggers events.
+			this._selectedIndices.removeEventListeners();
+			this._selectedIndex = -1;
 			this.dataProvider = null;
 			super.dispose();
 		}
@@ -1013,16 +1053,25 @@ package feathers.controls
 					this.dataViewPort.getScrollPositionForIndex(this.pendingItemIndex, HELPER_POINT);
 					this.pendingItemIndex = -1;
 
-					if(this.pendingScrollDuration > 0)
+					var targetHorizontalScrollPosition:Number = HELPER_POINT.x;
+					if(targetHorizontalScrollPosition < this._minHorizontalScrollPosition)
 					{
-						this.throwTo(Math.max(0, Math.min(HELPER_POINT.x, this._maxHorizontalScrollPosition)),
-							Math.max(0, Math.min(HELPER_POINT.y, this._maxVerticalScrollPosition)), this.pendingScrollDuration);
+						targetHorizontalScrollPosition = this._minHorizontalScrollPosition;
 					}
-					else
+					else if(targetHorizontalScrollPosition > this._maxHorizontalScrollPosition)
 					{
-						this.horizontalScrollPosition = Math.max(0, Math.min(HELPER_POINT.x, this._maxHorizontalScrollPosition));
-						this.verticalScrollPosition = Math.max(0, Math.min(HELPER_POINT.y, this._maxVerticalScrollPosition));
+						targetHorizontalScrollPosition = this._maxHorizontalScrollPosition;
 					}
+					var targetVerticalScrollPosition:Number = HELPER_POINT.y;
+					if(targetVerticalScrollPosition < this._minVerticalScrollPosition)
+					{
+						targetVerticalScrollPosition = this._minVerticalScrollPosition;
+					}
+					else if(targetVerticalScrollPosition > this._maxVerticalScrollPosition)
+					{
+						targetVerticalScrollPosition = this._maxVerticalScrollPosition;
+					}
+					this.throwTo(targetHorizontalScrollPosition, targetVerticalScrollPosition, this.pendingScrollDuration);
 				}
 			}
 			super.handlePendingScroll();
@@ -1074,6 +1123,14 @@ package feathers.controls
 			{
 				this.selectedIndex = Math.min(this._dataProvider.length - 1, this._selectedIndex + 1);
 			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected function dataProvider_changeHandler(event:Event):void
+		{
+			this.invalidate(INVALIDATION_FLAG_DATA);
 		}
 
 		/**
