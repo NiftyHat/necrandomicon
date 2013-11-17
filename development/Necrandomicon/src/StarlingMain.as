@@ -1,11 +1,10 @@
 package  
 {
 	import feathers.controls.Button;
-	import feathers.themes.MetalWorksMobileTheme;
-	import game.spells.Spell;
+	import game.spells.IconBuilder;
+	import game.spells.IconObject;
 	import starling.display.Sprite;
 	import starling.events.Event;
-	import starling.text.TextField;
 	/**
 	 * ...
 	 * @author Duncan Saunders
@@ -25,7 +24,6 @@ package
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 			
-			new Spell()
 		}
 		
 
