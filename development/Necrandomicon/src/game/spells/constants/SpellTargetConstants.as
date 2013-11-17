@@ -24,8 +24,8 @@ package game.spells.constants
 		/** Effects the entire caster's side, including the caster */public static const ALL_ALLIES_AND_SELF:String = "spell::scope::allAlliesAndSelf"
 		/** Effects the entire caster's side, aside from the caster */public static const ALL_ALLIES:String = "spell::scope::allAllies"
 		/** Effects the entire enemy side */public static const ALL_ENEMIES:String = "spell::scope::allEnemies"
-		/** Effects the entirity of one side, chosen by the caster */public static const ALL_EITHER_SIDE_USER_PICKS:String = "spell::scope::allOneSideUserPicks";
-		/** Effects the entirity of one side, randomly determined */public static const ALL_EITHER_SIDE_RANDOM_PICK:String = "spell::scope::allOneSideRandomPick";
+		/** Effects the entirity of one side, randomly determined */public static const ALL_EITHER_TEAM_RANDOM_PICK:String = "spell::scope::allRandomPick";
+		/** Effects the entirity of one side, chosen by the caster */public static const ALL_EITHER_TEAM_USER_PICKS:String = "spell::scope::allTeamUserPicks";
 		
 		/** Effects the EVERYONE in the battle */public static const EVERYONE:String = "spell::scope::allParticipants"
 		/** Effects the EVERYONE in the battle, aside from the caster */public static const EVERYONE_BAR_SELF:String = "spell::scope::allParticipantsBarSelf";
