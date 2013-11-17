@@ -14,6 +14,31 @@ package engine.statistics
 			
 		}
 		
+		public function getSortedStats($list:Array):Vector.<Stat> {
+			var len:int  = $list.length;
+			var ret:Vector.<Stat> = new Vector.<Stat> ();
+			for (var i:int = 0; i < len; i++) {
+				var id:String = $list[i];
+				if (id && hasStat(id)) {
+					ret.push(getStat(id));
+				}
+			}
+			return ret;
+		}
+		
+		private function getStat($id:String):Stat 
+		{
+			return dictStats[$id];
+		}
+		
+		public function hasStat($id:String):Boolean 
+		{
+			if (dictStats[$id]) {
+				return true;
+			}
+			return false;
+		}
+		
 		public function debugString():String 
 		{
 			var out:String = "";

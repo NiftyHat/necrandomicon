@@ -6,20 +6,21 @@ package engine.battle.events
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
 	 */
-	public class BattleEvent extends Event 
+	public class UIEvent extends Event 
 	{
+		static public const BATTLE_SETUP:String = "battleSetup";
 		
 		protected var _data:*;
 		
-		public function BattleEvent(type:String,data:*, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function UIEvent(type:String,data:*, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{ 
-			super(type, data, bubbles, cancelable);
+			super(type, bubbles, cancelable);
 			
 		} 
 		
 		public override function clone():Event 
 		{ 
-			return new BattleEvent(type, data, bubbles, cancelable);
+			return new UIEvent(type, data, bubbles, cancelable);
 		} 
 		
 		public override function toString():String 

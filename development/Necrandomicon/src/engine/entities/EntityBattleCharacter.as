@@ -48,6 +48,11 @@ package engine.entities
 			return (_stats.health.current <= 0);
 		}
 		
+		public function get stats():NecStats 
+		{
+			return _stats;
+		}
+		
 	}
 
 }

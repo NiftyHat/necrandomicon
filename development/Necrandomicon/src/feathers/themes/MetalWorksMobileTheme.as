@@ -70,6 +70,8 @@ package feathers.themes
 	import feathers.system.DeviceCapabilities;
 	import feathers.textures.Scale3Textures;
 	import feathers.textures.Scale9Textures;
+	import game.ui.screens.components.BattleCharacterDetailsPanel;
+	import game.ui.screens.components.BattleCharacterPanel;
 
 	import flash.display.BitmapData;
 	import flash.geom.Rectangle;
@@ -317,7 +319,7 @@ package feathers.themes
 			const regularFontNames:String = "SourceSansPro";
 			const semiboldFontNames:String = "SourceSansProSemibold";
 
-			this.headerTextFormat = new TextFormat(semiboldFontNames, Math.round(36 * this.scale), LIGHT_TEXT_COLOR, true);
+			this.headerTextFormat = new TextFormat(semiboldFontNames, Math.round(24 * this.scale), LIGHT_TEXT_COLOR, true);
 
 			this.smallUIDarkTextFormat = new TextFormat(semiboldFontNames, 24 * this.scale, DARK_TEXT_COLOR, true);
 			this.smallUILightTextFormat = new TextFormat(semiboldFontNames, 24 * this.scale, LIGHT_TEXT_COLOR, true);
@@ -491,6 +493,8 @@ package feathers.themes
 			this.setInitializerForClass(GroupedList, groupedListInitializer);
 			this.setInitializerForClass(GroupedList, insetGroupedListInitializer, GroupedList.ALTERNATE_NAME_INSET_GROUPED_LIST);
 			this.setInitializerForClass(Panel, panelInitializer);
+			this.setInitializerForClass(BattleCharacterPanel, panelInitializer);
+			this.setInitializerForClass(BattleCharacterDetailsPanel, panelInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerToolbarInitializer, ScrollContainer.ALTERNATE_NAME_TOOLBAR);
 		}

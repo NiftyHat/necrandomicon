@@ -22,7 +22,12 @@ package engine.statistics
 			var perc:Number = Math.random() * $perc;
 			if (perc < 0) perc = 0;
 			var newVal:int = _totalModified * perc;
+			if (newVal < _totalUnmodified) totalUnmodified = newVal;
 			current = newVal;
+		}
+		
+		public function get printValue ():String {
+			return current + "/" + totalModified;
 		}
 		
 		public function get id():String 

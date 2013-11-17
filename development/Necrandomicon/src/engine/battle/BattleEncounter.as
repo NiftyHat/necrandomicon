@@ -1,7 +1,9 @@
 package engine.battle 
 {
+	import engine.battle.events.UIEvent;
 	import engine.entities.EntityBattleCharacter;
 	import flash.events.EventDispatcher;
+	import game.crux.Crux;
 	/**
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
@@ -21,8 +23,8 @@ package engine.battle
 			addEnemy(new EntityBattleCharacter("Random_1"));
 			addEnemy(new EntityBattleCharacter("Random_2"));
 			addEnemy(new EntityBattleCharacter("Random_3"));
-			trace(_teamAlly);
-			trace(_teamEnemy)
+			addEnemy(new EntityBattleCharacter("Random_4"));
+			Crux.control.dispatchEvent(new UIEvent(UIEvent.BATTLE_SETUP, this));
 		}
 		
 		private function init():void 

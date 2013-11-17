@@ -2,16 +2,9 @@ package game.ui.screens.components
 {
 	import engine.entities.EntityBattleCharacter;
 	import feathers.controls.Header;
-	import feathers.controls.Label;
-	import feathers.controls.List;
 	import feathers.controls.Panel;
-	import feathers.core.IFeathersControl;
-	import feathers.display.Scale9Image;
-	import feathers.themes.MetalWorksMobileTheme;
-	import flash.text.TextFormat;
-	import game.crux.Crux;
+	import feathers.layout.VerticalLayout;
 	import starling.core.Starling;
-	import starling.display.Image;
 	import starling.events.Event;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
@@ -20,7 +13,7 @@ package game.ui.screens.components
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
 	 */
-	public class BattleCharacterPanel extends Panel implements IFeathersControl 
+	public class BattleCharacterDetailsPanel extends Panel 
 	{
 		private var _health:BattleStatDisplay;
 		private var _speed:BattleStatDisplay;
@@ -28,7 +21,7 @@ package game.ui.screens.components
 		private var _defense:BattleStatDisplay;
 		private var _character:EntityBattleCharacter;
 		
-		public function BattleCharacterPanel() 
+		public function BattleCharacterDetailsPanel() 
 		{
 			
 			super();
@@ -38,25 +31,24 @@ package game.ui.screens.components
 				header.maxHeight = 34 * Starling.contentScaleFactor;
 				return header
 			}
-			minHeight = 100;
-			minWidth = 180;
-			
+			minHeight = 300;
+			minWidth = 200;
+			padding = 3;
+			layout = new VerticalLayout ();
 			//_backgroundDisabledSkin = new Image( disabledTextures );
 			_health = new BattleStatDisplay ();
-			addEventListener(TouchEvent.TOUCH, onTouch);
-		}
-		
-		private function onTouch(e:TouchEvent):void 
-		{
-			if (e.touches[0].phase == TouchPhase.ENDED) {
-				dispatchEvent(new Event(Event.SELECT));
-			}
+			_speed = new BattleStatDisplay ();
+			_defense = new BattleStatDisplay ();
+			_offense = new BattleStatDisplay ();
 		}
 		
 		override protected function initialize():void 
 		{
 			super.initialize();
 			addChild(_health);
+			addChild(_speed);
+			addChild(_defense);
+			addChild(_offense);
 		}
 		
 		public function setCharacter($character:EntityBattleCharacter):void {
@@ -64,14 +56,15 @@ package game.ui.screens.components
 			_character = $character;
 			headerProperties.title = $character.name;
 			_health.setStat($character.stats.health);
+			_speed.setStat($character.stats.speed);
+			_offense.setStat($character.stats.offense);
+			_defense.setStat($character.stats.defense);
 		}
 		
 		public function get character():EntityBattleCharacter 
 		{
 			return _character;
 		}
-		
-		
 		
 	}
 
