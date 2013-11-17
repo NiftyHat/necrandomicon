@@ -57,8 +57,9 @@ package engine.statistics
 		public function createStat($name:String, $current:int = 0, $total:int = 100):Stat {
 			var stat:Stat = new Stat ();
 			stat.id = $name;
-			stat.current = $current;
 			stat.totalUnmodified = $total;
+			stat.current = $current;
+			
 			return addStat(stat);
 		}
 		

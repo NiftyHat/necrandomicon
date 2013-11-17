@@ -37,7 +37,7 @@ package game.ui.screens.components
 			_value.text = $stat.printValue;
 			_bar = new ProgressBar ();
 			_name.x = 0;
-			_value.x = 100;
+			_value.x = 80;
 			_bar.y = 40;
 			_bar.width = 150;
 			_bar.height = 10;

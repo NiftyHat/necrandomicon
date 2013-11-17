@@ -70,6 +70,7 @@ package feathers.themes
 	import feathers.system.DeviceCapabilities;
 	import feathers.textures.Scale3Textures;
 	import feathers.textures.Scale9Textures;
+	import game.ui.screens.components.BattleActionSelect;
 	import game.ui.screens.components.BattleCharacterDetailsPanel;
 	import game.ui.screens.components.BattleCharacterPanel;
 
@@ -495,6 +496,7 @@ package feathers.themes
 			this.setInitializerForClass(Panel, panelInitializer);
 			this.setInitializerForClass(BattleCharacterPanel, panelInitializer);
 			this.setInitializerForClass(BattleCharacterDetailsPanel, panelInitializer);
+			this.setInitializerForClass(BattleActionSelect, panelInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerToolbarInitializer, ScrollContainer.ALTERNATE_NAME_TOOLBAR);
 		}
