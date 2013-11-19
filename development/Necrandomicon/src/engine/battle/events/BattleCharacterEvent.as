@@ -11,6 +11,7 @@ package engine.battle.events
 	{
 		static public const START_TURN:String = "startTurn";
 		static public const END_TURN:String = "endTurn";
+		static public const UPDATE_STATS:String = "updateStats";
 		
 		protected var _character:EntityBattleCharacter;
 		
@@ -28,6 +29,11 @@ package engine.battle.events
 		public override function toString():String 
 		{ 
 			return formatToString("BattleCharacterEvent", "type", "character", "bubbles", "cancelable", "eventPhase"); 
+		}
+		
+		public function get character():EntityBattleCharacter 
+		{
+			return _character;
 		}
 		
 	}

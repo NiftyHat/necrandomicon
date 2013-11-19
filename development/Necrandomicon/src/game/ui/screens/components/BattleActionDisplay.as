@@ -1,10 +1,10 @@
 package game.ui.screens.components 
 {
 	import engine.battle.BattleAction;
-	import engine.battle.events.BattleTurnEvent;
-	import engine.battle.events.UIEvent;
+	import feathers.controls.Callout;
 	import feathers.controls.Label;
-	import game.crux.Crux;
+	import feathers.controls.renderers.DefaultListItemRenderer;
+	import feathers.textures.Scale9Textures;
 	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
@@ -20,15 +20,35 @@ package game.ui.screens.components
 		private var _value:Label;
 		private var _icon:Sprite;
 		private var _action:BattleAction;
+		private var _targetLabel:Label;
 		
 		public function BattleActionDisplay() 
 		{
 			super();
-			init();
-			addEventListener(TouchEvent.TOUCH, onTouch);
+			
+			//_targetLabel = new Label ();
+			//_targetLabel.text = "Target description";
 			//y = 100;
 			//_value = new Label ();
+			initialize();
+		}
+		
+		protected function initialize():void 
+		{
+			//super.initialize();
+			_icon = new Sprite ();
+			_icon.addChild( new Quad (96, 96, 0xC0C0C0));
+			_name = new Label ();
+			_name.x = _icon.height - 96;
+			_name.y = 96
+			_name.width = 96;
+			_name.touchable = false;
+			if (_action) _name.text = _action.name;
 			
+			addChild(_icon);
+			addChild(_name);
+			touchable = true;
+			_icon.addEventListener(TouchEvent.TOUCH, onTouch);
 		}
 		
 		override public function dispose():void 
@@ -40,26 +60,14 @@ package game.ui.screens.components
 		private function onTouch(e:TouchEvent):void 
 		{
 			if (e.touches[0].phase == TouchPhase.ENDED) {
-				dispatchEvent(new Event(Event.SELECT));
+				dispatchEvent(new Event(Event.TRIGGERED));
 			}
 		}
 		
 		public function setAction($action:BattleAction):void 
 		{
 			_action = $action;
-			_name.text = action.name;
-		}
-		
-		private function init():void 
-		{
-			_icon = new Sprite ();
-			_icon.addChild( new Quad (96, 96, 0xC0C0C0));
-			_name = new Label ();
-			_name.x = _icon.width + 4;;
-			_name.width = 120;
-			_name.text = "Action Name";
-			addChild(_name);
-			addChild(_icon);
+			if (_name)  _name.text = _action.name;
 		}
 		
 		public function get action():BattleAction 

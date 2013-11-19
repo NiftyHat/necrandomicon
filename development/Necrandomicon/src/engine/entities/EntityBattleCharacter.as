@@ -1,5 +1,6 @@
 package engine.entities 
 {
+	import engine.battle.actions.AttackAction;
 	import engine.battle.BattleAction;
 	import engine.battle.BattleEncounter;
 	import engine.battle.events.BattleCharacterEvent;
@@ -45,7 +46,7 @@ package engine.entities
 				_stats.randomize();
 			}
 			_actions = new Vector.<BattleAction> ();
-			_actions.push (BattleAction.createAction("Attack", 3, BattleAction.SCOPE_ANY));
+			_actions.push (new AttackAction () );
 			_actions.push (BattleAction.createAction("Defend" , 5, BattleAction.SCOPE_SELF));
 			_actions.push (BattleAction.createAction("Wait", 1));
 			calcTick();
@@ -68,6 +69,11 @@ package engine.entities
 		public function onJoinBattle():void 
 		{
 			calcTick();
+		}
+		
+		public function updateHealth():void 
+		{
+			Crux.control.dispatchEvent(new BattleCharacterEvent(BattleCharacterEvent.UPDATE_STATS, this));
 		}
 		
 		public function get isDead():Boolean {

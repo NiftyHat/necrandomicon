@@ -1,6 +1,7 @@
 package engine.battle.turns 
 {
 	import engine.battle.BattleAction;
+	import engine.battle.BattleEncounter;
 	import engine.entities.EntityBattleCharacter;
 	/**
 	 * ...
@@ -9,6 +10,7 @@ package engine.battle.turns
 	public class BattleTurn 
 	{
 		
+		protected var _manager:ConditionalTurnManager;
 		protected var _character:EntityBattleCharacter;
 		protected var _action:BattleAction; 
 		protected var _possibleTargets:Vector.<EntityBattleCharacter>;
@@ -17,6 +19,10 @@ package engine.battle.turns
 		public function BattleTurn() 
 		{
 			
+		}
+		
+		public function get characterName():String {
+			return _character.name;
 		}
 		
 		public function setAction($action:BattleAction):void 
@@ -57,6 +63,16 @@ package engine.battle.turns
 		public function set targets(value:Vector.<EntityBattleCharacter>):void 
 		{
 			_targets = value;
+		}
+		
+		public function set manager(value:ConditionalTurnManager):void 
+		{
+			_manager = value;
+		}
+		
+		public function get manager():ConditionalTurnManager 
+		{
+			return _manager;
 		}
 	
 	}

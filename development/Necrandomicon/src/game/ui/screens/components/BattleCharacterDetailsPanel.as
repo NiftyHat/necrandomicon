@@ -31,7 +31,7 @@ package game.ui.screens.components
 				header.maxHeight = 34 * Starling.contentScaleFactor;
 				return header
 			}
-			minHeight = 300;
+			minHeight = 240;
 			minWidth = 200;
 			padding = 3;
 			layout = new VerticalLayout ();
@@ -40,6 +40,7 @@ package game.ui.screens.components
 			_speed = new BattleStatDisplay ();
 			_defense = new BattleStatDisplay ();
 			_offense = new BattleStatDisplay ();
+			alignPivot();
 		}
 		
 		override protected function initialize():void 

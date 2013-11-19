@@ -1,5 +1,6 @@
 package game.ui.screens.components 
 {
+	import engine.battle.events.BattleCharacterEvent;
 	import engine.entities.EntityBattleCharacter;
 	import feathers.controls.Header;
 	import feathers.controls.Label;
@@ -37,8 +38,23 @@ package game.ui.screens.components
 			minWidth = 180;
 			
 			//_backgroundDisabledSkin = new Image( disabledTextures );
+			Crux.control.addEventListener(BattleCharacterEvent.UPDATE_STATS, onUpdateStats);
 			_health = new BattleStatDisplay ();
 			addEventListener(TouchEvent.TOUCH, onTouch);
+		}
+		
+		override public function dispose():void 
+		{
+			Crux.control.removeEventListener(BattleCharacterEvent.UPDATE_STATS, onUpdateStats);
+			super.dispose();
+		}
+		
+		private function onUpdateStats(e:BattleCharacterEvent):void 
+		{
+			if (e.character == _character) {
+				_health.update(_character.stats.health.current,_character.stats.health.totalModified);
+			}
+			
 		}
 		
 		public function selectedAsTarget():void {

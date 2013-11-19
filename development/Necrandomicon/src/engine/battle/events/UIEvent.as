@@ -10,6 +10,8 @@ package engine.battle.events
 	{
 		static public const BATTLE_SETUP:String = "battleSetup";
 		static public const ACTION_SELECT:String = "actionSelect";
+		static public const HIDE_ACTION_SELECT:String = "hideActionSelect";
+		static public const TARGET_SELECT_PROMPT:String = "targetSelectPrompt";
 		
 		protected var _data:*;
 		

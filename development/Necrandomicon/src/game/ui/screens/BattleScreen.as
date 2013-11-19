@@ -20,6 +20,7 @@ package game.ui.screens
 	import game.ui.screens.components.BattleCharacterDetailsPanel;
 	import game.ui.screens.components.BattleCharacterPanel;
 	import game.ui.screens.components.BattleTeamPanel;
+	import game.ui.screens.components.BattleTurnOrderList;
 	import starling.core.Starling;
 	import starling.events.Event;
 	
@@ -34,6 +35,7 @@ package game.ui.screens
 		private var _allyPanel:Panel;
 		private var _detailsPanel:BattleCharacterDetailsPanel;
 		private var _anchorLayout:AnchorLayout;
+		private var _turnOrderList:BattleTurnOrderList;
 		private var _battleTurn:BattleTurn;
 		private var _isSelectionMode:Boolean;
 		
@@ -48,11 +50,16 @@ package game.ui.screens
 			_allyPanel.y = Starling.current.stage.stageHeight - _allyPanel.minHeight;
 			_detailsPanel = new BattleCharacterDetailsPanel ();
 			_detailsPanel.x = Starling.current.stage.stageWidth - 200;
+			_detailsPanel.y = Starling.current.stage.stageHeight - _detailsPanel.minHeight;
 			_anchorLayout = new AnchorLayout ();
+			_turnOrderList = new BattleTurnOrderList ();
+			_turnOrderList.x = Starling.current.stage.stageWidth - 200;
+			
 			layout = _anchorLayout;
 			addChild(_detailsPanel);
 			addChild(_enemyPanel);
 			addChild(_allyPanel);
+			addChild(_turnOrderList);
 			addListeners();
 		}
 		
@@ -60,14 +67,24 @@ package game.ui.screens
 		{
 			Crux.control.addEventListener(BattleTurnEvent.START, onTurnStart);
 			Crux.control.addEventListener(BattleTurnEvent.TARGET_SELECTION, onTargetSelection);
+			//Crux.control.addEventListener(BattleTurnEvent.ACTION_SELECTED, onActionSelected);
 			Crux.control.addEventListener(BattleTurnEvent.COMMIT_ACTION, onCommitAction);
 		}
+		
+		private function onActionSelected(e:BattleTurnEvent):void 
+		{
+			_isSelectionMode = false;
+			clearSelection();
+		}
+		
+		
 		
 		private function onCommitAction(e:BattleTurnEvent):void 
 		{
 			_isSelectionMode = false;
 			clearSelection();
 		}
+
 		
 		private function onTargetSelection(e:BattleTurnEvent):void 
 		{
@@ -84,6 +101,7 @@ package game.ui.screens
 					endSelection();
 				break;
 				default:
+					Crux.control.dispatchEvent(new UIEvent(UIEvent.TARGET_SELECT_PROMPT, null));
 					_isSelectionMode = true;
 				break;
 				//case BattleAction.SC

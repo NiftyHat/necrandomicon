@@ -52,7 +52,8 @@ package engine.battle.turns
 					if (tempCharacters.length == 0) {
 						throw new Error ("no characters left to make preditions for :/");
 					}
-					var turn:ConditionalTurn = new ConditionalTurn ()
+					var turn:ConditionalTurn = new ConditionalTurn ();
+					turn.manager = this;
 					turn.character = item;
 					turn.calcTick(lookAhead);
 					if (turn.tick > biggestCounter) {
@@ -95,6 +96,11 @@ package engine.battle.turns
 				}
 			}
 			return 0;
+		}
+		
+		public function get turns():Vector.<ConditionalTurn> 
+		{
+			return _turns;
 		}
 		
 	}

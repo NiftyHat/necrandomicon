@@ -6,6 +6,8 @@ package
 	import feathers.controls.ScreenNavigator;
 	import feathers.controls.ScreenNavigatorItem;
 	import feathers.themes.MetalWorksMobileTheme;
+	import feathers.themes.MinimalMobileTheme;
+	import feathers.themes.NecrandomiconTheme;
 	import game.crux.Crux;
 	import game.ui.screens.BattleScreen;
 	import game.ui.screens.SpellScreen;
@@ -33,7 +35,7 @@ package
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 			Crux.init();
-			new MetalWorksMobileTheme (this, false);
+			new NecrandomiconTheme (this, false);
 			//new Spell()
 			addChild(Crux.screens);
 			Crux.screens.addScreen("Startup", new ScreenNavigatorItem (StartupScreen)); ;

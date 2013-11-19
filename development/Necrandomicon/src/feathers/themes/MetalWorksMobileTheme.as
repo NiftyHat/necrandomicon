@@ -70,6 +70,7 @@ package feathers.themes
 	import feathers.system.DeviceCapabilities;
 	import feathers.textures.Scale3Textures;
 	import feathers.textures.Scale9Textures;
+	import game.ui.screens.components.BattleActionDisplay;
 	import game.ui.screens.components.BattleActionSelect;
 	import game.ui.screens.components.BattleCharacterDetailsPanel;
 	import game.ui.screens.components.BattleCharacterPanel;
@@ -449,6 +450,7 @@ package feathers.themes
 			this.setInitializerForClass(TextFieldTextRenderer, itemRendererAccessoryLabelInitializer, BaseDefaultItemRenderer.DEFAULT_CHILD_NAME_ACCESSORY_LABEL);
 			this.setInitializerForClass(ScrollText, scrollTextInitializer);
 			this.setInitializerForClass(Button, buttonInitializer);
+			this.setInitializerForClass(Button, simpleButtonInitializer);
 			this.setInitializerForClass(Button, callToActionButtonInitializer, Button.ALTERNATE_NAME_CALL_TO_ACTION_BUTTON);
 			this.setInitializerForClass(Button, quietButtonInitializer, Button.ALTERNATE_NAME_QUIET_BUTTON);
 			this.setInitializerForClass(Button, dangerButtonInitializer, Button.ALTERNATE_NAME_DANGER_BUTTON);
@@ -494,9 +496,7 @@ package feathers.themes
 			this.setInitializerForClass(GroupedList, groupedListInitializer);
 			this.setInitializerForClass(GroupedList, insetGroupedListInitializer, GroupedList.ALTERNATE_NAME_INSET_GROUPED_LIST);
 			this.setInitializerForClass(Panel, panelInitializer);
-			this.setInitializerForClass(BattleCharacterPanel, panelInitializer);
-			this.setInitializerForClass(BattleCharacterDetailsPanel, panelInitializer);
-			this.setInitializerForClass(BattleActionSelect, panelInitializer);
+			
 			this.setInitializerForClass(ScrollContainer, scrollContainerInitializer);
 			this.setInitializerForClass(ScrollContainer, scrollContainerToolbarInitializer, ScrollContainer.ALTERNATE_NAME_TOOLBAR);
 		}

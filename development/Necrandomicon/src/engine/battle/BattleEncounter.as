@@ -97,6 +97,7 @@ package engine.battle
 		}
 		
 		private function advanceToNextTurn():void {
+			_turnManager.removeFirstTurn();
 			_turnManager.updateTurns();
 			var battleTurn:ConditionalTurn = _turnManager.getNextTurn();
 			startTurn(battleTurn);
