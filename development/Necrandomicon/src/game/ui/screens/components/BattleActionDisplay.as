@@ -10,6 +10,7 @@ package game.ui.screens.components
 	import starling.events.Event;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
+	import starling.filters.BlurFilter;
 	/**
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
@@ -21,6 +22,7 @@ package game.ui.screens.components
 		private var _icon:Sprite;
 		private var _action:BattleAction;
 		private var _targetLabel:Label;
+		private var _isSelected:Boolean;
 		
 		public function BattleActionDisplay() 
 		{
@@ -49,6 +51,19 @@ package game.ui.screens.components
 			addChild(_name);
 			touchable = true;
 			_icon.addEventListener(TouchEvent.TOUCH, onTouch);
+		}
+		
+		public function set isSelected($value:Boolean):void {
+			_isSelected = $value;
+			if (_isSelected) {
+				filter = BlurFilter.createGlow(0xFFFFFF, 1.0, 0.5, 0.5);
+			} else {
+				filter = null;
+			}
+		}
+		
+		public function get isSelected():Boolean {
+			return _isSelected
 		}
 		
 		override public function dispose():void 

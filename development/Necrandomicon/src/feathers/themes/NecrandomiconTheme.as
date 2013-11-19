@@ -30,7 +30,7 @@ package feathers.themes
 			this.setInitializerForClass(BattleCharacterPanel, panelInitializer);
 			this.setInitializerForClass(BattleCharacterDetailsPanel, panelInitializer);
 			this.setInitializerForClass(BattleActionSelect, panelInitializer);
-			//this.setInitializerForClass(BattleActionDisplay , panelInitializer);
+			this.setInitializerForClass(BattleActionDisplay , itemRendererInitializer);
 			this.setInitializerForClass(BattleTurnOrderList, listInitializer);
 			//this.setInitializerForClass(BattleHighlightOverlay, highlightOverlayInitlize)
 		}

@@ -40,7 +40,7 @@ package game.ui.screens.components
 			_speed = new BattleStatDisplay ();
 			_defense = new BattleStatDisplay ();
 			_offense = new BattleStatDisplay ();
-			alignPivot();
+			
 		}
 		
 		override protected function initialize():void 
@@ -50,6 +50,7 @@ package game.ui.screens.components
 			addChild(_speed);
 			addChild(_defense);
 			addChild(_offense);
+			alignPivot();
 		}
 		
 		public function setCharacter($character:EntityBattleCharacter):void {

@@ -108,7 +108,7 @@ package game.ui.screens.components
 			clearSelection();
 			var actionDisplay:BattleActionDisplay = e.target as BattleActionDisplay;
 			actionDisplay.action.owner = _turn.character;
-			//actionDisplay.isSelected = true;
+			actionDisplay.isSelected = true;
 			_turn.setAction(actionDisplay.action);
 			_selectedAction = actionDisplay.action;
 			Crux.control.dispatchEvent(new BattleTurnEvent(BattleTurnEvent.ACTION_SELECTED, _turn));
@@ -119,7 +119,7 @@ package game.ui.screens.components
 			_confirmButton.isEnabled = false;
 			//alpha = 1.0;
 			for each (var item:BattleActionDisplay in _actionButtons) {
-				//item.isSelected = false;
+				item.isSelected = false;
 			}
 		}
 		
