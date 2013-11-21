@@ -55,22 +55,44 @@ package engine.battle
 			var turn:BattleTurn = e.turn;
 			var targetScope:String = e.turn.action.targetScope;
 			var selectionScope:String = e.turn.action.selectionScope;
+			var modifierScope:String = e.turn.action.modifierScope;
 			var targetList:Vector.<EntityBattleCharacter> = new Vector.<EntityBattleCharacter> ();
-			switch (selectionScope) {
+			var owner:EntityBattleCharacter = turn.action.owner;
+			var ownerTeam:Vector.<EntityBattleCharacter> = getTeam(owner);
+			var opposingTeam:Vector.<EntityBattleCharacter>;
+			if (ownerTeam == _teamAlly) {
+				opposingTeam = _teamEnemy;
+			} else {
+				opposingTeam = _teamAlly
+			}
+			
+			var none:Boolean = (targetScope == BattleAction.TARGET_NONE);
+			var self:Boolean = (targetScope == BattleAction.TARGET_SELF);
+			var any:Boolean = (selectionScope == BattleAction.SCOPE_ANY);
+			var excludes_self:Boolean = (modifierScope == BattleAction.NOT_SELF);
+			if (none) {
+				
+			}
+			else if (self) {
+				targetList.push(owner);
+			} else {
+				switch (selectionScope) {
 				default:
 				case BattleAction.SCOPE_ANY:
 					targetList = _characters.slice();
 					break;
 				case BattleAction.SCOPE_ALLY:
-					targetList = _teamAlly.slice();
+					targetList = ownerTeam.slice();
 					break;
 				case BattleAction.SCOPE_ENEMY:
-					targetList = _teamEnemy.slice();
-					break;
-				case BattleAction.SCOPE_SELF:
-					targetList.push(turn.character);
-					break;
+					targetList = opposingTeam.slice();
+				break;
+				}
 			}
+			if (!self && excludes_self) {
+				targetList.splice(targetList.indexOf(owner), 1);
+			}
+			
 			turn.possibleTargets = targetList;
 			Crux.control.dispatchEvent(new BattleTurnEvent(BattleTurnEvent.TARGET_SELECTION, turn));
 		}

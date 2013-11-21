@@ -10,20 +10,22 @@ package engine.battle
 		
 		public var name:String = "default action";
 		public var owner:EntityBattleCharacter;
-		public var targetScope:String = TARGET_SINGLE;
+		public var targetScope:String = TARGET_NONE;
 		public var selectionScope:String = SCOPE_ANY;
+		public var modifierScope:String = null;
 		
 		static public const TARGET_SINGLE:String = "selectionSingle";
 		static public const TARGET_TEAM:String = "selectionTeam";
+		static public const TARGET_EVERYONE:String = "selectionTeam";
+		static public const TARGET_SELF:String = "selectionSelf";
 		static public const TARGET_NONE:String = "selectionNone";
 		
 		static public const SCOPE_ALLY:String = "scopeAlly";
 		static public const SCOPE_ENEMY:String = "scopeEnemy";
-		static public const SCOPE_SELF:String = "scopeSelf";
+		static public const SCOPE_RANDOM:String = "scopeRandom";
 		static public const SCOPE_ANY:String = "scopeAny";
 		
-		static public const RANGE_FIXED:String = "rangeFixed";
-		static public const RANGE_RANDOM:String = "rangeRandom";
+		static public const NOT_SELF:String = "notSelf";
 		
 		
 		protected var _rank:int = 3;

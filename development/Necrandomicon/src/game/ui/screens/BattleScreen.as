@@ -89,8 +89,27 @@ package game.ui.screens
 		private function onTargetSelection(e:BattleTurnEvent):void 
 		{
 			var turn:BattleTurn = e.turn;
-			var targetScope:String = turn.action.selectionScope;
+			var targetScope:String = turn.action.targetScope;
+			var selectionScope:String = turn.action.selectionScope;
 			var list:Vector.<EntityBattleCharacter> = new Vector.<EntityBattleCharacter> ()
+			var random:Boolean = (selectionScope == BattleAction.SCOPE_RANDOM);
+			var any:Boolean = (selectionScope == BattleAction.SCOPE_ANY);
+			var single:Boolean = (targetScope == BattleAction.TARGET_SINGLE);
+			var team:Boolean = (targetScope == BattleAction.TARGET_TEAM);
+			if (single & !random)
+			{
+				startSelection();
+			}
+			if (team & any) {
+				startSelection();
+			}else {
+				if (random) {
+					
+				}
+				turn.targets = turn.possibleTargets.slice();
+				endSelection();
+			}
+			/*
 			switch (targetScope) {
 				case BattleAction.SCOPE_SELF:
 					list.push(turn.action.owner); 
@@ -105,7 +124,13 @@ package game.ui.screens
 					_isSelectionMode = true;
 				break;
 				//case BattleAction.SC
-			}
+			}*/
+		}
+		
+		private function startSelection():void 
+		{
+			Crux.control.dispatchEvent(new UIEvent(UIEvent.TARGET_SELECT_PROMPT, null));
+			_isSelectionMode = true;
 		}
 		
 		private function onTurnStart(e:BattleTurnEvent):void 
