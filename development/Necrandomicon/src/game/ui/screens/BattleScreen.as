@@ -7,6 +7,8 @@ package game.ui.screens
 	import engine.battle.events.UIEvent;
 	import engine.battle.turns.BattleTurn;
 	import engine.entities.EntityBattleCharacter;
+	import engine.enums.TargetScope;
+	import engine.enums.SelectionScope;
 	import feathers.controls.LayoutGroup;
 	import feathers.controls.Panel;
 	import feathers.controls.PanelScreen;
@@ -66,7 +68,7 @@ package game.ui.screens
 		private function addListeners():void 
 		{
 			Crux.control.addEventListener(BattleTurnEvent.START, onTurnStart);
-			Crux.control.addEventListener(BattleTurnEvent.TARGET_SELECTION, onTargetSelection);
+			Crux.control.addEventListener(BattleTurnEvent.TARGET_SELECTION, onSelectionScope);
 			//Crux.control.addEventListener(BattleTurnEvent.ACTION_SELECTED, onActionSelected);
 			Crux.control.addEventListener(BattleTurnEvent.COMMIT_ACTION, onCommitAction);
 		}
@@ -86,25 +88,30 @@ package game.ui.screens
 		}
 
 		
-		private function onTargetSelection(e:BattleTurnEvent):void 
+		private function onSelectionScope(e:BattleTurnEvent):void 
 		{
 			var turn:BattleTurn = e.turn;
-			var targetScope:String = turn.action.targetScope;
-			var selectionScope:String = turn.action.selectionScope;
+			var targetScope:TargetScope = turn.action.targetScope;
+			var selectionScope:SelectionScope = turn.action.selectionScope;
 			var list:Vector.<EntityBattleCharacter> = new Vector.<EntityBattleCharacter> ()
-			var random:Boolean = (selectionScope == BattleAction.SCOPE_RANDOM);
-			var any:Boolean = (selectionScope == BattleAction.SCOPE_ANY);
-			var single:Boolean = (targetScope == BattleAction.TARGET_SINGLE);
-			var team:Boolean = (targetScope == BattleAction.TARGET_TEAM);
-			if (single & !random)
+			var random:Boolean = (selectionScope == SelectionScope.RANDOM);
+			var any:Boolean = (selectionScope == SelectionScope.ANY);
+			var single:Boolean = (targetScope == TargetScope.SINGLE);
+			var team:Boolean = (targetScope == TargetScope.TEAM);
+			if (single && !random)
 			{
 				startSelection();
 			}
-			if (team & any) {
+			if (team && any) {
 				startSelection();
 			}else {
 				if (random) {
-					
+					var count:int = turn.possibleTargets.length * Math.random();
+					while (count > 0) {
+						var len:int = turn.possibleTargets.length - 1;
+						turn.possibleTargets.splice(len, 1);
+						count--;
+					}
 				}
 				turn.targets = turn.possibleTargets.slice();
 				endSelection();
@@ -174,14 +181,14 @@ package game.ui.screens
 			clearSelection();
 			if (_isSelectionMode) {
 				if (_battleTurn.possibleTargets.indexOf(char) != -1) {
-					if (_battleTurn.action.targetScope == BattleAction.TARGET_TEAM) {
+					if (_battleTurn.action.targetScope == TargetScope.TEAM) {
 						var team:Vector.<EntityBattleCharacter> = _battle.getTeam(char)
 						for each (var teamChar:EntityBattleCharacter in team) {
 							selectCharacter(teamChar);
 							list = team;
 						}
 					}
-					if (_battleTurn.action.targetScope == BattleAction.TARGET_SINGLE) {
+					if (_battleTurn.action.targetScope == TargetScope.SINGLE) {
 						selectCharacter(char);
 						list = new Vector.<EntityBattleCharacter> ();
 						list.push(char);

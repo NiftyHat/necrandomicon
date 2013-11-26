@@ -16,6 +16,16 @@ package engine.battle.controller
 			
 		}
 		
+		public function setAction ():void {
+			
+		}
+		
+		public function setTargets():void {
+			
+		}
+		
+		public function 
+		
 	}
 
 }

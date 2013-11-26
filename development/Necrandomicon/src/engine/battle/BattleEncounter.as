@@ -6,6 +6,8 @@ package engine.battle
 	import engine.battle.turns.ConditionalTurn;
 	import engine.battle.turns.ConditionalTurnManager;
 	import engine.entities.EntityBattleCharacter;
+	import engine.enums.SelectionScope;
+	import engine.enums.TargetScope;
 	import flash.events.EventDispatcher;
 	import game.crux.Crux;
 	import game.spells.constants.SpellTargetConstants;
@@ -53,8 +55,8 @@ package engine.battle
 		private function onActionSelected(e:BattleTurnEvent):void 
 		{
 			var turn:BattleTurn = e.turn;
-			var targetScope:String = e.turn.action.targetScope;
-			var selectionScope:String = e.turn.action.selectionScope;
+			var targetScope:TargetScope = e.turn.action.targetScope;
+			var selectionScope:SelectionScope = e.turn.action.selectionScope;
 			var modifierScope:String = e.turn.action.modifierScope;
 			var targetList:Vector.<EntityBattleCharacter> = new Vector.<EntityBattleCharacter> ();
 			var owner:EntityBattleCharacter = turn.action.owner;
@@ -66,9 +68,9 @@ package engine.battle
 				opposingTeam = _teamAlly
 			}
 			
-			var none:Boolean = (targetScope == BattleAction.TARGET_NONE);
-			var self:Boolean = (targetScope == BattleAction.TARGET_SELF);
-			var any:Boolean = (selectionScope == BattleAction.SCOPE_ANY);
+			var none:Boolean = (selectionScope == SelectionScope.NONE);
+			var self:Boolean = (targetScope == TargetScope.NONE);
+			var any:Boolean = (selectionScope == SelectionScope.ANY);
 			var excludes_self:Boolean = (modifierScope == BattleAction.NOT_SELF);
 			if (none) {
 				
@@ -78,13 +80,13 @@ package engine.battle
 			} else {
 				switch (selectionScope) {
 				default:
-				case BattleAction.SCOPE_ANY:
+				case SelectionScope.ANY:
 					targetList = _characters.slice();
 					break;
-				case BattleAction.SCOPE_ALLY:
+				case SelectionScope.ALLY:
 					targetList = ownerTeam.slice();
 					break;
-				case BattleAction.SCOPE_ENEMY:
+				case SelectionScope.ENEMY:
 					targetList = opposingTeam.slice();
 				break;
 				}

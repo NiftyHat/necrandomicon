@@ -42,7 +42,7 @@ package game.ui.screens.components
 			_icon.addChild( new Quad (96, 96, 0xC0C0C0));
 			_name = new Label ();
 			_name.x = _icon.height - 96;
-			_name.y = 96
+			_name.y = 0;
 			_name.width = 96;
 			_name.touchable = false;
 			if (_action) _name.text = _action.name;

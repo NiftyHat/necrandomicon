@@ -12,7 +12,7 @@ package engine.battle.events
 		static public const START:String = "battleTurnStart";
 		static public const END:String = "battleTurnEnd";
 		static public const ACTION_SELECTED:String = "actionSelected";
-		static public const TARGET_SELECTION:String = "targetSelection";
+		static public const TARGET_SELECTION:String = "SelectionScope";
 		static public const WAIT_FOR_COMMIT:String = "waitForCommit";
 		static public const COMMIT_ACTION:String = "commitAction";
 		

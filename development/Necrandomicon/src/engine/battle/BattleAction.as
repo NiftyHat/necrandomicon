@@ -1,6 +1,8 @@
 package engine.battle 
 {
 	import engine.entities.EntityBattleCharacter;
+	import engine.enums.TargetScope;
+	import engine.enums.SelectionScope;
 	/**
 	 * ...
 	 * @author Duncan Saunders @ niftyhat.com
@@ -10,20 +12,9 @@ package engine.battle
 		
 		public var name:String = "default action";
 		public var owner:EntityBattleCharacter;
-		public var targetScope:String = TARGET_NONE;
-		public var selectionScope:String = SCOPE_ANY;
+		public var targetScope:TargetScope = TargetScope.SINGLE;
+		public var selectionScope:SelectionScope = SelectionScope.ANY;
 		public var modifierScope:String = null;
-		
-		static public const TARGET_SINGLE:String = "selectionSingle";
-		static public const TARGET_TEAM:String = "selectionTeam";
-		static public const TARGET_EVERYONE:String = "selectionTeam";
-		static public const TARGET_SELF:String = "selectionSelf";
-		static public const TARGET_NONE:String = "selectionNone";
-		
-		static public const SCOPE_ALLY:String = "scopeAlly";
-		static public const SCOPE_ENEMY:String = "scopeEnemy";
-		static public const SCOPE_RANDOM:String = "scopeRandom";
-		static public const SCOPE_ANY:String = "scopeAny";
 		
 		static public const NOT_SELF:String = "notSelf";
 		
@@ -36,11 +27,14 @@ package engine.battle
 			
 		}
 		
-		public static function createAction ($name:String, $rank:int, $selection:String = null):BattleAction {
+		public static function createAction ($name:String, $rank:int, $targetScope:TargetScope = null, $selectionScope:SelectionScope = null):BattleAction {
 			var newAction:BattleAction = new BattleAction ();
 			newAction.name = $name;
 			newAction.rank = $rank;
-			newAction.selectionScope = $selection;
+			if (!$targetScope) $targetScope = TargetScope.SINGLE;
+			if (!$selectionScope) $selectionScope = SelectionScope.ANY;
+			newAction.targetScope = $targetScope;
+			newAction.selectionScope = $selectionScope;
 			return newAction;
 		}
 		

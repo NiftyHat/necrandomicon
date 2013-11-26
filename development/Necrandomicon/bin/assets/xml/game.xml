@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	<ENEMIES>
+		<ENEMY>
+			<ID key="wolf" name="Wolf"/>
+			<STAT key="Health" value="20" min="20" max="35"/>
+			<STAT key="Offence" value="3" min="3" max="4"/>
+			<STAT key="Defense" value="2" min="2" max="2"/>
+			<ACTION key="Bite"/>
+			<ACTION key="Claw" power="2" rank="1" />
+		</ENEMY>
+	</ENEMIES>
+	<TEMPLATES>
+		<ACTIONS>
+			<!-- -->
+			<ACTION key="Bite" power="3" rank="3" />
+		</ACTIONS>
+	</TEMPLATES>
+</data>

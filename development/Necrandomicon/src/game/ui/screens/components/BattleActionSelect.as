@@ -10,8 +10,10 @@ package game.ui.screens.components
 	import feathers.controls.Label;
 	import feathers.controls.LayoutGroup;
 	import feathers.controls.Panel;
+	import feathers.controls.ScrollContainer;
 	import feathers.layout.HorizontalLayout;
 	import feathers.layout.TiledColumnsLayout;
+	import feathers.layout.TiledRowsLayout;
 	import game.crux.Crux;
 	import starling.events.Event;
 	import starling.events.TouchEvent;
@@ -28,24 +30,35 @@ package game.ui.screens.components
 		protected var _selectedAction:BattleAction;
 		protected var _confirmButton:Button;
 		protected var _turn:BattleTurn;
-		protected var _layoutActions:LayoutGroup;
+		protected var _layoutActions:ScrollContainer;
 		protected var _targetScope:Callout;
 		protected var _targetLabel:Label;
 		
 		public function BattleActionSelect() 
 		{
 			super();
-			y =200
-			minHeight = 420;
+			y =180
+			minHeight = 480;
 			maxWidth = 1024 * 0.7;
 			_actionButtons = new Vector.<BattleActionDisplay> ();
 			var colsLayout:TiledColumnsLayout = new TiledColumnsLayout ();
 			colsLayout.useSquareTiles = false;
 			colsLayout.horizontalAlign = TiledColumnsLayout.HORIZONTAL_ALIGN_LEFT;
-			colsLayout.gap = 5;
-			_layoutActions = new LayoutGroup ();
+			colsLayout.verticalAlign = TiledColumnsLayout.VERTICAL_ALIGN_TOP;
+			//colsLayout
+			//colsLayout.tileHorizontalAlign = TiledColumnsLayout.TILE_HORIZONTAL_ALIGN_LEFT;
+			//colsLayout.horizontalAlign = TiledColumnsLayout.HORIZONTAL_ALIGN_LEFT
+			colsLayout.gap = 1;
+			//colsLayout.paging = TiledRowsLayout.PAGING_VERTICAL;
+			_layoutActions = new ScrollContainer ();
+			_layoutActions.scrollBarDisplayMode = SCROLL_BAR_DISPLAY_MODE_FIXED;
+			_layoutActions.interactionMode = INTERACTION_MODE_MOUSE;
+			_layoutActions.y = 70;
+			_layoutActions.maxHeight = 420;
+			_layoutActions.minWidth = 420;
 			_layoutActions.layout = colsLayout;
-			_layoutActions.y = 100;
+		
+			
 			_confirmButton = new Button ();
 			_confirmButton.label = "Commit";
 			_confirmButton.isEnabled = false;

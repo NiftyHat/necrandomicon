@@ -5,6 +5,8 @@ package engine.entities
 	import engine.battle.BattleEncounter;
 	import engine.battle.events.BattleCharacterEvent;
 	import engine.battle.turns.BattleTurn;
+	import engine.enums.SelectionScope;
+	import engine.enums.TargetScope;
 	import game.crux.Crux;
 	import game.stats.NecStats;
 	/**
@@ -47,8 +49,18 @@ package engine.entities
 			}
 			_actions = new Vector.<BattleAction> ();
 			_actions.push (new AttackAction () );
-			_actions.push (BattleAction.createAction("Defend" , 5, BattleAction.SCOPE_SELF));
-			_actions.push (BattleAction.createAction("Wait", 1));
+			
+			var targets:Array = [TargetScope.EVERYONE, TargetScope.NONE, TargetScope.SELF, TargetScope.SINGLE, TargetScope.TEAM];
+			var selections:Array = [SelectionScope.ALLY, SelectionScope.ANY, SelectionScope.ENEMY, SelectionScope.RANDOM];
+			for each (var target:TargetScope in targets) {
+				for each (var selection:SelectionScope in selections) {
+					var rank:int = (Math.random() * 5) + 1
+					var name:String = target.Text + " \n " + selection.Text;
+					_actions.push (BattleAction.createAction(name, rank, target,selection));
+				}
+			}
+			
+			//_actions.push (BattleAction.createAction("Wait", 1));
 			calcTick();
 		}
 		
