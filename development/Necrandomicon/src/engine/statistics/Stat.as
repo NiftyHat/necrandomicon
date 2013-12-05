@@ -8,6 +8,7 @@ package engine.statistics
 	{
 		
 		protected var _id:String = "";
+		protected var _short:String = "ST";
         protected var _current:Number = 0;
         protected var _totalModified:Number = 0;
         protected var _totalUnmodified:Number = 0;
@@ -71,6 +72,16 @@ package engine.statistics
 		{
 			_totalUnmodified = value;
 			updateTotalModified();
+		}
+		
+		public function get short():String 
+		{
+			return _short;
+		}
+		
+		public function set short(value:String):void 
+		{
+			_short = value;
 		}
 		
 		private function updateTotalModified():void 

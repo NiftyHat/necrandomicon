@@ -11,6 +11,7 @@ package game.ui.screens.components
 	import feathers.themes.MetalWorksMobileTheme;
 	import flash.text.TextFormat;
 	import game.crux.Crux;
+	import game.ui.screens.effects.EffectDamageValue;
 	import starling.core.Starling;
 	import starling.display.Image;
 	import starling.events.Event;
@@ -48,7 +49,7 @@ package game.ui.screens.components
 			Crux.control.removeEventListener(BattleCharacterEvent.UPDATE_STATS, onUpdateStats);
 			super.dispose();
 		}
-		
+
 		private function onUpdateStats(e:BattleCharacterEvent):void 
 		{
 			if (e.character == _character) {

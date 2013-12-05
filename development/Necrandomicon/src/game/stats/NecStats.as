@@ -29,10 +29,10 @@ package game.stats
 		
 		private function init():void 
 		{
-			health = createStat("Health", 100, 100);
-			offense = createStat("Offense", 5, 10);
-			defense = createStat("Defense", 5, 10);
-			speed = createStat("Speed", 50, 100);
+			health = createStat( { id:"Health", totalUnmodified:100, current:100, short:"HP" } );// } "Health", 100, 100);
+			offense = createStat( { id:"Offense", totalUnmodified:5, current:10, short:"OFF" } );
+			defense = createStat( { id:"Defense", totalUnmodified:5, current:10, short:"DEF" } );
+			speed = createStat( { id:"Speed", totalUnmodified:50, current:100, short:"SPD" });
 		}
 		
 	}

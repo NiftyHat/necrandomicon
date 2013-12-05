@@ -54,11 +54,11 @@ package engine.statistics
 			return dictStats[$stat.id]
 		}
 		
-		public function createStat($name:String, $current:int = 0, $total:int = 100):Stat {
+		public function createStat($obj:Object):Stat {
 			var stat:Stat = new Stat ();
-			stat.id = $name;
-			stat.totalUnmodified = $total;
-			stat.current = $current;
+			for (var prop in $obj) {
+				stat[prop] = $obj[prop];
+			}
 			
 			return addStat(stat);
 		}

@@ -7,6 +7,7 @@ package game.ui.screens.components
 	import feathers.core.FeathersControl;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
+	import game.ui.screens.effects.EffectDamageValue;
 	import starling.core.Starling;
 	import starling.display.Quad;
 	import starling.display.Sprite;
@@ -21,6 +22,7 @@ package game.ui.screens.components
 		private var _name:Label;
 		private var _value:Label;
 		private var _bar:ProgressBar;
+		private var _stat:Stat;
 		
 		public function BattleStatDisplay() 
 		{
@@ -33,13 +35,20 @@ package game.ui.screens.components
 		
 		public function update($current:Number, $max:Number) {
 			_bar.maximum = $max;
+			
+			var effect:EffectDamageValue = new EffectDamageValue ();
+			effect.x = this.getBounds(Starling.current.stage).x;
+			effect.y = this.getBounds(Starling.current.stage).y;
+			effect.init($current - _bar.value, 0xFF0000,_stat.short);
+			Starling.current.stage.addChild(effect);
+			
 			Starling.juggler.tween(_bar, 0.3, { value:$current } );
 			_value.text = $current + "/" + $max;
 		}
 		
 
 		public function setStat($stat:Stat):void {
-			var _stat:Stat = $stat;
+			_stat = $stat;
 			_name.text = $stat.id;
 			_value.textRendererProperties.format = new TextFormat( "Source Sans Pro", 16, 0x333333, null,null,null,null, null, TextFormatAlign.CENTER)
 			_value.text = $stat.printValue;
